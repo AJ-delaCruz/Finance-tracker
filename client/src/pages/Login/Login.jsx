@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contextApi/AuthContext';
 import TextField from '@mui/material/TextField';
 import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 
 const Login = () => {
@@ -71,7 +72,11 @@ const Login = () => {
           <TextField
             id='outlined-basic'
             label='Username'
+            // placeholder='username'
             variant='outlined'
+            autoComplete='username'
+            autoFocus
+            required
             onChange={(e) => {
               setUsername(e.target.value);
             }}
@@ -81,6 +86,7 @@ const Login = () => {
             label='Password'
             type='password'
             required
+
             onChange={(e) => {
               setPassword(e.target.value);
             }}
@@ -92,7 +98,17 @@ const Login = () => {
           </Button>
         </form>
         {errorMessage && <p>{errorMessage}</p>}
+
+
+        <div className='button-container'>
+          <span>Don't have an account?</span>
+          <Link to="/register">
+            <Button type='submit' variant='contained' color="secondary">Register</Button>
+          </Link>
+        </div>
       </div>
+
+
     </div>
   );
 };
