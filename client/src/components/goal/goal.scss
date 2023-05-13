@@ -23,6 +23,11 @@
   }
 
   .bottom {
+    // background-color: lightblue;
+    width: 90%; // Set the width to the desired value 
+    margin: 0 auto; // Center the element horizontally 
+    margin-bottom: 30px; //space between pie chart and table
+
     .table-header {
       background-color: black;
 

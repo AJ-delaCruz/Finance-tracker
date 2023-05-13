@@ -103,20 +103,20 @@ const Goal = () => {
         return (currentAmount / targetAmount) * 100;
     };
 
- const data = [
-  ["Goal", "Target Amount", "Current Amount"],];
-goals.map((goal) => data.push([String(goal.name), goal.targetAmount, goal.currentAmount]));
- const options = {
-  title: "Goals",
-  chartArea: { width: "50%" },
-  hAxis: {
-    title: "Amount",
-    minValue: 0,
-  },
-  vAxis: {
-    title: "Goal",
-  },
-};
+    const data = [
+        ["Goal", "Target Amount", "Current Amount"],];
+    goals.map((goal) => data.push([String(goal.name), goal.targetAmount, goal.currentAmount]));
+    const options = {
+        title: "Goals",
+        chartArea: { width: "50%" },
+        hAxis: {
+            title: "Amount",
+            minValue: 0,
+        },
+        vAxis: {
+            title: "Goal",
+        },
+    };
 
 
     //sort/ pagination
@@ -151,14 +151,14 @@ goals.map((goal) => data.push([String(goal.name), goal.targetAmount, goal.curren
             </div>
 
             <div className="bottom">
-            <Chart
-      chartType="BarChart"
-      width="100%"
-      height="400px"
-      data={data}
-      options={options}
-    />
-                <div id="piechart" style={{ width: '90%', height: '500px' }}></div>
+                <Chart
+                    chartType="BarChart"
+                    width="100%"
+                    height="500px"
+                    data={data}
+                    options={options}
+                />
+
             </div>
 
             <div className="bottom">
