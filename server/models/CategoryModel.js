@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const categorySchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
 
     // todo create transaction type here also for less db query?
     // just put category array in user schema for simplicitty?
@@ -15,8 +15,9 @@ const categorySchema = new mongoose.Schema(
     timestamps: true,
   },
 );
-// categorySchema.index({ userId: 1, name: 1 }, { unique: true });
 
+// same unique category names specific for different users
+categorySchema.index({ userId: 1, name: 1 }, { unique: true });
 const CategoryModel = mongoose.model('category', categorySchema);
 
 export default CategoryModel;

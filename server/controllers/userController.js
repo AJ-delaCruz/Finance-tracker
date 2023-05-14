@@ -4,9 +4,9 @@ import UserModel from '../models/UserModel.js';
 import createDefaultCategories from '../Utils/categoryUtils.js';
 
 const register = async (req, res) => {
-  console.log('Inside SiGN UP POST');
+  // console.log('Inside SiGN UP POST');
   const { username, password } = req.body;
-
+  // console.log(req.body);
   try {
     // random string added to the password before hashed
     const salt = await bcrypt.genSalt(10);
@@ -22,7 +22,7 @@ const register = async (req, res) => {
 
     // Check if username is already taken
     const userTaken = await UserModel.findOne({ username });
-    console.log(username);
+    // console.log(username);
     if (userTaken) {
       // conflict
       res.status(409).json({ message: 'Username is taken' });
@@ -44,12 +44,12 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log('INSIDE LOGIN');
+  // console.log('INSIDE LOGIN');
 
   const { username, password } = req.body;
 
-  console.log(req.body.username);
-  console.log(req.body.password);
+  // console.log(req.body.username);
+  // console.log(req.body.password);
 
   try {
     const user = await UserModel.findOne({ username });
@@ -69,7 +69,7 @@ const login = async (req, res) => {
       return;
     }
 
-    console.log('SUCCESSFUL LOGIN');
+    // console.log('SUCCESSFUL LOGIN');
 
     // Generate a JWT token
     const payload = { _id: user._id, username: user.username };
