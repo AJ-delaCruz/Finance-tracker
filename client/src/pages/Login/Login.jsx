@@ -71,6 +71,7 @@ const Login = () => {
         <form onSubmit={handleLogin} className='register-form'>
           <TextField
             id='outlined-basic'
+            name="username"
             label='Username'
             // placeholder='username'
             variant='outlined'
@@ -83,6 +84,7 @@ const Login = () => {
           />
           <TextField
             id='outlined-password-input'
+            name="password"
             label='Password'
             type='password'
             required

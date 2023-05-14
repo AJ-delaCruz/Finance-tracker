@@ -75,7 +75,7 @@ const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={handleSubmit}>Add</Button>
+                <Button onClick={handleSubmit} data-testid="add-bill-button">Add</Button>
                 <Button onClick={handleClose}>Cancel</Button>
             </DialogActions>
 

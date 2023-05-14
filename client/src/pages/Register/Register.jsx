@@ -48,6 +48,7 @@ const Register = () => {
         <form onSubmit={handleSignUp} className='register-form'>
           <TextField
             id='outlined-basic'
+            name='username'
             label='Username'
             variant='outlined'
             autoFocus
@@ -58,6 +59,7 @@ const Register = () => {
           />
           <TextField
             id='outlined-password-input'
+            name='password'
             label='Password'
             type='password'
             required
@@ -67,7 +69,9 @@ const Register = () => {
           />
 
 
-          <Button variant='contained'>Sign Up</Button>
+          <Button type='submit' variant='contained'>
+            Sign Up
+          </Button>
           {errorMessage && <p>{errorMessage}</p>}
         </form>
 
