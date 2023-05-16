@@ -28,6 +28,7 @@ const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   maxPoolSize: 10, // max connections in the pool
+  // maxPoolSize: 100, //default
 };
 
 mongoose.connect(process.env.MONGODB_URL, options)
