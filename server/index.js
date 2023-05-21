@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import { Server } from 'socket.io';
 
 import userRoute from './routes/user.js';
 import accountRoute from './routes/account.js';
@@ -12,13 +14,27 @@ import goalRoute from './routes/goal.js';
 import billRoute from './routes/bills.js';
 import chatbotRoute from './routes/chatbot.js';
 
+dotenv.config();
+
 const app = express(); // create an express app
-app.use(cors()); // todo configure allowed domain/origin later
-// app.use(cors({origin: process.env.frontendURL, credentials: true}));
+
+// create a Socket.IO server for websocket and attach to http server
+const http = createServer(app); // create http server
+const io = new Server(http, {
+  // handle websocket connection
+  cors: {
+    origin: [process.env.frontendURL, 'http://localhost:4000'],
+  },
+});
+
+app.use(cors({
+  // handle http API request
+  origin: [process.env.frontendURL, 'http://localhost:4000'],
+  // credentials: true
+}));
 
 app.use(express.urlencoded({ extended: true })); // parse req.body with URL-encoded format by client
 app.use(express.json()); // parse request bodies that are in JSON format
-dotenv.config();
 
 const port = 3000 || process.env.PORT;
 
@@ -27,7 +43,7 @@ const port = 3000 || process.env.PORT;
 const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  maxPoolSize: 10, // max connections in the pool
+  maxPoolSize: 100, // max connections in the pool
   // maxPoolSize: 100, //default
 };
 
@@ -49,6 +65,19 @@ app.use('/goal', goalRoute);
 app.use('/bill', billRoute);
 app.use('/chat', chatbotRoute);
 
-app.listen(port, () => {
+// Handle WebSocket connections
+io.on('connection', (socket) => {
+  console.log('Websocket connected');
+
+  socket.emit('notificationEvent', { message: 'Goal success!' });
+  socket.emit('notificationEvent', { message: 'Budget success!' });
+
+  socket.on('disconnect', () => {
+    console.log('Websocket disconnected');
+  });
+});
+
+// start the HTTP server for both Express app and Socket.IO server
+http.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
