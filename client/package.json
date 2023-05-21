@@ -27,6 +27,7 @@
     "react-scripts": "5.0.1",
     "sass": "^1.62.1",
     "selenium-webdriver": "^4.9.2",
+    "socket.io-client": "^4.6.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -35,7 +36,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:selenium": "jest --config=./selenium/jest.config.js"
-
   },
   "eslintConfig": {
     "extends": [

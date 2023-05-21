@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import './navbar.scss';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
@@ -10,24 +10,65 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Settings from '@mui/icons-material/Settings';
 import Person from '@mui/icons-material/Person';
 import { AuthContext } from '../../contextApi/AuthContext';
+import { NotificationContext } from '../../contextApi/NotificationContext';
+import { Button, IconButton, Badge, ListItemText } from '@mui/material';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+
+// import io from 'socket.io-client';
+// import { backendUrl } from '../../config';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
+  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const { logout } = useContext(AuthContext);
+  //track number of notification
+  const { notificationCount, notificationEvents, markAsRead, markAllAsRead } = useContext(NotificationContext);
+  const navigate = useNavigate();
 
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+
+  // const open = Boolean(anchorEl);
+  const notificationOpen = Boolean(notificationAnchorEl);
+  const profileOpen = Boolean(profileAnchorEl);
+
+
+  const handleNotificationIconMenuClick = (event) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+
+  const handleProfileClick = (event) => {
+    setProfileAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setNotificationAnchorEl(null);
+    setProfileAnchorEl(null);
   };
 
   const handleLogout = () => {
     handleClose();
     logout();
   };
+
+  const handleProfile = () => {
+    handleClose();
+    navigate('/profile');
+  };
+
+  const handleSettings = () => {
+    handleClose();
+    navigate('/settings');
+  };
+
+
+  //read invididual notification event
+  const handleNotificationClick = (index) => {
+    markAsRead(index);
+
+  };
+
+
 
   return (
     <div className="navbar">
@@ -38,20 +79,53 @@ const Navbar = () => {
       </div>
 
       <div className="right">
-        <NotificationsOutlinedIcon className="icon-cls" />
-        <div onClick={handleClick}>
+
+        <IconButton color="inherit" onClick={handleNotificationIconMenuClick}>
+          <Badge badgeContent={notificationCount} color="primary">
+            <NotificationsOutlinedIcon className="icon-cls" style={{ marginRight: "-7px" }} />
+
+          </Badge>
+        </IconButton>
+
+        <div className="leftRight" onClick={handleProfileClick}>
           <PersonOutlinedIcon className="icon-cls" />
         </div>
 
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose} >
-          <MenuItem onClick={handleClose}>
+        <Menu anchorEl={notificationAnchorEl} open={notificationOpen} onClose={handleClose}>
+
+          {notificationEvents.length > 0 ? (
+            [
+              notificationEvents.map((event, index) => (
+                <MenuItem key={index} onClick={() => handleNotificationClick(index)}>
+                  <ListItemIcon>
+                    <NotificationsActiveIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={event.message} />
+                </MenuItem>
+              )),
+              <MenuItem onClick={markAllAsRead}>
+                <ListItemText secondary="Mark all as read" align="center" />
+              </MenuItem>
+            ]
+          ) : (
+            <MenuItem disabled>
+
+              <ListItemText primary="No notifications" />
+            </MenuItem>
+          )}
+        </Menu>
+
+
+        <Menu anchorEl={profileAnchorEl} open={profileOpen} onClose={handleClose} >
+
+          <MenuItem onClick={handleProfile}>
             <ListItemIcon>
               <Person fontSize="small" />
             </ListItemIcon>
             Profile
           </MenuItem>
 
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={handleSettings}>
             <ListItemIcon>
               <Settings fontSize="small" />
             </ListItemIcon>
@@ -64,6 +138,13 @@ const Navbar = () => {
             </ListItemIcon>
             Logout
           </MenuItem>
+
+
+          {/* {goalsReached.map((goal, index) => (
+            <MenuItem key={index} onClick={handleClose}>
+              {goal}
+            </MenuItem>
+          ))} */}
 
         </Menu>
       </div>
