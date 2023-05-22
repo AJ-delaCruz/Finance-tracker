@@ -2,11 +2,11 @@ import BudgetModel from '../models/BudgetModel.js';
 
 // add a budget to track spending
 const createBudget = async (req, res) => {
-  console.log('req.body:', req.body);
-  console.log('req.user:', req.user);
+  // console.log('req.body:', req.body);
+  // console.log('req.user:', req.user);
 
   const {
-    name, amount, period, startDate, endDate, category,
+    name, amount, limit, period, startDate, endDate, category,
   } = req.body;
   const userId = req.user._id;
   try {
@@ -14,6 +14,7 @@ const createBudget = async (req, res) => {
       userId,
       name,
       amount,
+      limit,
       period,
       startDate,
       endDate,
@@ -35,7 +36,9 @@ const getAllBudgets = async (req, res) => {
   const userId = req.user._id;
   try {
     // retrieve all the budgets using userId
-    const budgets = await BudgetModel.find({ userId });
+    // const budgets = await BudgetModel.find({ userId });
+    const budgets = await BudgetModel.find({ userId }).populate('category', 'name');
+
     // console.log(budgets);
     res.status(200).json(budgets);
   } catch (error) {
@@ -50,7 +53,7 @@ const getBudget = async (req, res) => {
 const updateBudget = async (req, res) => {
   const { id } = req.params;
   const {
-    amount, period, startDate, endDate,
+    amount, limit, period, startDate, endDate, category,
   } = req.body;
 
   try {
@@ -58,7 +61,7 @@ const updateBudget = async (req, res) => {
     const updatedBudget = await BudgetModel.findByIdAndUpdate(
       id,
       {
-        amount, period, startDate, endDate,
+        amount, limit, period, startDate, endDate, category,
       },
       { new: true },
     );

@@ -1,50 +1,91 @@
-import mongoose from 'mongoose';
 import TransactionModel from '../models/TransactionModel.js';
 import AccountModel from '../models/AccountModel.js';
-import BudgetModel from '../models/UserModel.js';
+import BudgetModel from '../models/BudgetModel.js';
 import GoalModel from '../models/GoalModel.js';
+import UserModel from '../models/UserModel.js';
+import { io } from '../index.js';
 
 const addTransaction = async (req, res) => {
   const {
     // required in transactions
     account, category, type, amount,
     // optional
-    budget, goal, description,
+    // budget,
+    // goal,
+    description,
   } = req.body;
 
   const userId = req.user._id;
+  // console.log(userId);
   try {
     const newTransaction = new TransactionModel({
-      userId, account, category, type, amount, budget, goal, description,
+      userId, account, category, type, amount, description,
     });
     // const newTransaction = new TransactionModel(req.body);
 
     // create new Transaction
     await newTransaction.save();
-    // console.log(saveTransaction);
-    console.log(newTransaction);
+    // console.log(newTransaction);
 
     // todo: use RabbitMQ or Kafka to handle updates for account, budget, and goal?
+    // using websocket API instead
 
     // Adjust account balance
     // increment balance if transaction type is income else decrement
     const accountUpdate = { $inc: { balance: type === 'income' ? amount : -amount } };
-    await AccountModel.findByIdAndUpdate(account, accountUpdate);
+    const updatedAccount = await AccountModel.findByIdAndUpdate(
+      account,
+      accountUpdate,
+      { new: true },
+    );
+    // console.log(updatedAccount);
 
     // Adjust user budget if it exists
+    const budget = await BudgetModel.findOne({ userId, category });
+    // console.log(budget);
     if (budget) {
-      // increment budget amount if transaction type is income else decrement
-      const budgetUpdate = { $inc: { amount: type === 'income' ? amount : -amount } };
-      await BudgetModel.findByIdAndUpdate(budget, budgetUpdate);
+      // increment budget amount
+      const budgetUpdate = { $inc: { amount: +amount } };
+      // await BudgetModel.findByIdAndUpdate(budget, budgetUpdate);
+      const updatedBudget = await BudgetModel.findByIdAndUpdate(
+        budget,
+        budgetUpdate,
+        { new: true },
+      );
       console.log('budget updated');
+
+      // send real time notification if budget exceeded limit
+      if (updatedBudget.amount >= updatedBudget.limit) {
+        io.emit('notificationEvent', {
+          user: userId,
+          budget: updatedBudget,
+          message: `Budget: ${budget.period} ${budget.name} has exceeded $${budget.limit} limit`,
+        });
+      }
     }
 
     // Adjust user goal if it exists
-    if (goal) {
-      // increment goal currentAmount if transaction type is income else decrement
-      const goalUpdate = { $inc: { currentAmount: type === 'income' ? amount : -amount } };
-      await GoalModel.findByIdAndUpdate(goal, goalUpdate);
+    const user = await UserModel.findOne(userId);
+    if (user.currentGoal) {
+      // increment goal currentAmount if account type is debit/savings else decrement for loan/CC
+      const goalUpdate = { $inc: { currentAmount: updatedAccount.type === 'Checking' || updatedAccount.type === 'Savings' ? amount : -amount } };
+      // await GoalModel.findByIdAndUpdate(user.currentGoal, goalUpdate);
+      const updatedGoal = await GoalModel.findByIdAndUpdate(
+        user.currentGoal,
+        goalUpdate,
+        { new: true },
+      );
+      // console.log(updatedGoal);
       console.log('goal updated');
+
+      // send real time notification if goal is completed
+      if (updatedGoal.currentAmount >= updatedGoal.targetAmount) {
+        io.emit('notificationEvent', {
+          user: userId,
+          goal: updatedGoal,
+          message: `Congratulations, Goal: ${updatedGoal.name} achieved!`,
+        });
+      }
     }
 
     // Return the new transaction as response to the client
@@ -59,7 +100,7 @@ const getAllTransactions = async (req, res) => {
     const userId = req.user._id;
     const transactions = await TransactionModel.find({ userId })
       .populate('account', 'name') // retrieve account name instead of id
-      .populate('category', 'name'); //retrieve category name instead of id
+      .populate('category', 'name'); // retrieve category name instead of id
 
     // no transactions found
     if (!transactions) {
@@ -77,7 +118,7 @@ const getAllTransactions = async (req, res) => {
   }
 };
 
-const getTransaction = async (req, res) => {
+const getTransactionByType = async (req, res) => {
   const transactionType = req.query.type; // expense or income
   // console.log(req.headers);
 
@@ -131,5 +172,5 @@ const getTransaction = async (req, res) => {
 // };
 
 export {
-  addTransaction, getAllTransactions, getTransaction,
+  addTransaction, getAllTransactions, getTransactionByType,
 };

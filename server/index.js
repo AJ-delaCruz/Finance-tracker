@@ -69,8 +69,8 @@ app.use('/chat', chatbotRoute);
 io.on('connection', (socket) => {
   console.log('Websocket connected');
 
-  socket.emit('notificationEvent', { message: 'Goal success!' });
-  socket.emit('notificationEvent', { message: 'Budget success!' });
+  // socket.emit('notificationEvent', { message: 'Goal success!' });
+  // socket.emit('notificationEvent', { message: 'Budget success!' });
 
   socket.on('disconnect', () => {
     console.log('Websocket disconnected');
@@ -81,3 +81,5 @@ io.on('connection', (socket) => {
 http.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+export { io };
