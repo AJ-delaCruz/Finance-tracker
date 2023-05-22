@@ -12,12 +12,31 @@ import { useState } from 'react';
 
 const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
     const [bill, setBill] = useState({});
+    const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
+
         setBill({ ...bill, [e.target.name]: e.target.value });
+        validateField(name, value);
+
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const fields = ['name', 'amount', 'dueDate'];
+        let isValid = true;
+
+        fields.forEach((field) => {
+            if (!validateField(field, bill[field])) {
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            return;
+        }
 
         try {
             const token = localStorage.getItem("token");
@@ -38,6 +57,16 @@ const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
         }
     };
 
+    const validateField = (name, value) => {
+        if (!value) {
+            setErrors((errors) => ({ ...errors, [name]: 'This field is required' }));
+            return false;
+        }
+
+        setErrors((errors) => ({ ...errors, [name]: '' }));
+        return true;
+    };
+
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Add Bill</DialogTitle>
@@ -50,15 +79,19 @@ const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
                     label="Name"
                     type="text"
                     fullWidth
+                    required
                     onChange={handleChange}
+                    error={!!errors.name}
+                    helperText={errors.name}
                 />
                 <TextField
-                    autoFocus
                     margin="dense"
                     name="amount"
                     label="Amount"
                     type="number"
                     fullWidth
+                    error={!!errors.amount}
+                    helperText={errors.amount}
                     onChange={handleChange}
                 />
                 <TextField
@@ -71,6 +104,8 @@ const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
                     InputLabelProps={{
                         shrink: true,
                     }}
+                    error={!!errors.dueDate}
+                    helperText={errors.dueDate}
                 />
             </DialogContent>
 

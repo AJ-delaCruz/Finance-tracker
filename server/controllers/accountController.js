@@ -31,7 +31,7 @@ const getAllAccounts = async (req, res) => {
     // no accounts found
     if (!accounts) {
       // not found
-      res.status(4004).json({ message: 'no accounts found' });
+      res.status(404).json({ message: 'no accounts found' });
       console.log('no accounts found');
       return;
     }

@@ -42,66 +42,68 @@ const AccountModal = ({ open, handleClose, handleAddedAccount }) => {
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Add Account</DialogTitle>
-            <DialogContent>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    name="name"
-                    label="Account Name"
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    onChange={handleChange}
-                    required
-                />
-                <FormControl fullWidth variant="outlined" margin="dense">
-                    <InputLabel>Type</InputLabel>
-                    <Select
-                        name="type"
-                        value={account.type || ''}
+            <form onSubmit={handleSubmit}>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        name="name"
+                        label="Account Name"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
                         onChange={handleChange}
-                        label="Type"
-                    >
-                        <MenuItem value="Checking">Checking</MenuItem>
-                        <MenuItem value="Savings">Savings</MenuItem>
-                        <MenuItem value="Credit Card">Credit Card</MenuItem>
-                        <MenuItem value="Loan">Loan</MenuItem>
-                    </Select>
-                </FormControl>
-                <TextField
-                    margin="dense"
-                    name="balance"
-                    label="Balance"
-                    type="number"
-                    fullWidth
-                    variant="outlined"
-                    onChange={handleChange}
-                    required
-                />
-
-                {account.type === 'Credit Card' && (
+                        required
+                    />
+                    <FormControl fullWidth variant="outlined" margin="dense">
+                        <InputLabel>Type</InputLabel>
+                        <Select
+                            name="type"
+                            value={account.type || ''}
+                            onChange={handleChange}
+                            label="Type"
+                        >
+                            <MenuItem value="Checking">Checking</MenuItem>
+                            <MenuItem value="Savings">Savings</MenuItem>
+                            <MenuItem value="Credit Card">Credit Card</MenuItem>
+                            <MenuItem value="Loan">Loan</MenuItem>
+                        </Select>
+                    </FormControl>
                     <TextField
                         margin="dense"
-                        name="creditLimit"
-                        label="Credit Limit"
+                        name="balance"
+                        label="Balance"
                         type="number"
                         fullWidth
                         variant="outlined"
                         onChange={handleChange}
                         required
                     />
-                )}
 
-            </DialogContent>
+                    {account.type === 'Credit Card' && (
+                        <TextField
+                            margin="dense"
+                            name="creditLimit"
+                            label="Credit Limit"
+                            type="number"
+                            fullWidth
+                            variant="outlined"
+                            onChange={handleChange}
+                            required
+                        />
+                    )}
+
+                </DialogContent>
 
 
-            <DialogActions style={{
-                display: 'flex',
-                justifyContent: 'space-between'
-            }}>
-                <Button onClick={handleSubmit}>Add</Button>
-                <Button onClick={handleClose}>Cancel</Button>
-            </DialogActions>
+                <DialogActions style={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                }}>
+                    <Button type="submit" >Add</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
+                </DialogActions>
+            </form>
         </Dialog>
     );
 };

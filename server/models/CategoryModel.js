@@ -8,7 +8,7 @@ const categorySchema = new mongoose.Schema(
 
     // todo create transaction type here also for less db query?
     // just put category array in user schema for simplicitty?
-    // type: { type: String, enum: ['income', 'expense'] },
+    type: { type: String, enum: ['income', 'expense'] },
 
   },
   {

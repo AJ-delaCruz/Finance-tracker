@@ -37,8 +37,17 @@
     display: flex;
     margin-top: 5px;
 
+
+
     .leftRight {
       margin-left: 10px;
+    }
+
+    .MuiBadge-badge {
+      // width: 20px;
+      // height: 20px;
+      font-size: 15px;
+      // border-radius: 50%;
     }
 
     cursor: pointer;

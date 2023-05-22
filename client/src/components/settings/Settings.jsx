@@ -36,7 +36,7 @@ const Settings = () => {
 
     useEffect(() => {
         getAccounts();
-    }, [accounts]);
+    }, []);
 
     return (
 

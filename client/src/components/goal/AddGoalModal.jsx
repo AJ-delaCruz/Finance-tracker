@@ -37,64 +37,69 @@ const AddGoalModal = ({ open, handleClose, updateGoal }) => {
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Add Goal</DialogTitle>
+            <form onSubmit={handleSubmit}>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        name="name"
+                        label="Name"
+                        type="text"
+                        fullWidth
+                        required
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="description"
+                        label="Description"
+                        type="text"
+                        fullWidth
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="currentAmount"
+                        label="Current Amount"
+                        type="number"
+                        fullWidth
+                        required
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="targetAmount"
+                        label="Target Amount"
+                        type="number"
+                        fullWidth
+                        required
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        required
+                        margin="dense"
+                        name="targetDate"
+                        label="Target Date"
+                        type="date"
+                        fullWidth
+                        onChange={handleChange}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
 
-            <DialogContent>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    name="name"
-                    label="Name"
-                    type="text"
-                    fullWidth
-                    onChange={handleChange}
-                />
-                <TextField
-                    margin="dense"
-                    name="description"
-                    label="Description"
-                    type="text"
-                    fullWidth
-                    onChange={handleChange}
-                />
-                <TextField
-                    margin="dense"
-                    name="currentAmount"
-                    label="Current Amount"
-                    type="number"
-                    fullWidth
-                    onChange={handleChange}
-                />
-                <TextField
-                    margin="dense"
-                    name="targetAmount"
-                    label="Target Amount"
-                    type="number"
-                    fullWidth
-                    onChange={handleChange}
-                />
-                <TextField
-                    margin="dense"
-                    name="targetDate"
-                    label="Target Date"
-                    type="date"
-                    fullWidth
-                    onChange={handleChange}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                />
-
-            </DialogContent>
+                </DialogContent>
 
 
-            <DialogActions style={{
-                display: 'flex',
-                justifyContent: 'space-between'
+                <DialogActions style={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
 
-            }}>
-                <Button onClick={handleSubmit}>Add</Button>
-                <Button onClick={handleClose}>Cancel</Button>
-            </DialogActions>
+                }}>
+                    <Button type="submit" >Add</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
+                </DialogActions>
+            </form>
         </Dialog>
     );
 };

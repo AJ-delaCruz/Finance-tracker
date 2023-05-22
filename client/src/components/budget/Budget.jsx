@@ -124,6 +124,13 @@ const Budget = () => {
             result = a.name.localeCompare(b.name);
         } else if (orderBy === 'amount') {
             result = a.amount - b.amount;
+        } else if (orderBy === 'limit') {
+            result = a.amount - b.amount;
+        } else if (orderBy === 'category') {
+            // result = a.category?.name.localeCompare(b.category?.name);
+            const aCategoryName = a.category?.name || '';
+            const bCategoryName = b.category?.name || '';
+            result = aCategoryName.localeCompare(bCategoryName);
         } else if (orderBy === 'period') {
             result = a.period.localeCompare(b.period);
         } else if (orderBy === 'startDate') {
@@ -138,9 +145,9 @@ const Budget = () => {
     const drawChart = () => {
         const data = new GoogleCharts.api.visualization.DataTable();
         data.addColumn('string', 'Name');
-        data.addColumn('number', 'Amount');
+        data.addColumn('number', 'Limit');
 
-        const formattedData = budgets.map((budget) => [String(budget.name), budget.amount]);
+        const formattedData = budgets.map((budget) => [String(budget.name), budget.limit]);
         // console.log(formattedData);
         data.addRows(formattedData);
 
@@ -189,6 +196,7 @@ const Budget = () => {
                                         Name
                                     </TableSortLabel>
                                 </TableCell>
+
                                 <TableCell className='center-align tab-header'>
                                     <TableSortLabel
                                         active={orderBy === 'amount'}
@@ -198,6 +206,28 @@ const Budget = () => {
                                         Amount
                                     </TableSortLabel>
                                 </TableCell>
+
+
+                                <TableCell className='center-align tab-header'>
+                                    <TableSortLabel
+                                        active={orderBy === 'limit'}
+                                        direction={orderBy === 'limit' ? order : 'asc'}
+                                        onClick={() => handleSortChange('limit')}
+                                    >
+                                        Limit
+                                    </TableSortLabel>
+                                </TableCell>
+
+                                <TableCell className='center-align tab-header'>
+                                    <TableSortLabel
+                                        active={orderBy === 'category'}
+                                        direction={orderBy === 'category' ? order : 'asc'}
+                                        onClick={() => handleSortChange('category')}
+                                    >
+                                        Category
+                                    </TableSortLabel>
+                                </TableCell>
+
                                 <TableCell className='center-align tab-header'>
                                     <TableSortLabel
                                         active={orderBy === 'period'}
@@ -237,6 +267,8 @@ const Budget = () => {
                                     <TableRow key={budget._id}>
                                         <TableCell className='center-align'>{budget.name}</TableCell>
                                         <TableCell className='center-align'>${budget.amount}</TableCell>
+                                        <TableCell className='center-align'>${budget?.limit}</TableCell>
+                                        <TableCell className='center-align'>{budget.category?.name}</TableCell>
                                         <TableCell className='center-align'>{budget.period}</TableCell>
                                         <TableCell className='center-align'>{new Date(budget.startDate).toLocaleDateString()}</TableCell>
                                         <TableCell className='center-align'>{new Date(budget.endDate).toLocaleDateString()}</TableCell>

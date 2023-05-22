@@ -81,8 +81,8 @@ const Navbar = () => {
       <div className="right">
 
         <IconButton color="inherit" onClick={handleNotificationIconMenuClick}>
-          <Badge badgeContent={notificationCount} color="primary">
-            <NotificationsOutlinedIcon className="icon-cls" style={{ marginRight: "-7px" }} />
+          <Badge badgeContent={notificationCount} color="primary" >
+            <NotificationsOutlinedIcon className="icon-cls" style={{ marginRight: "-9px" }} />
 
           </Badge>
         </IconButton>
@@ -103,7 +103,7 @@ const Navbar = () => {
                   <ListItemText primary={event.message} />
                 </MenuItem>
               )),
-              <MenuItem onClick={markAllAsRead}>
+              <MenuItem key="mark-all" onClick={markAllAsRead}>
                 <ListItemText secondary="Mark all as read" align="center" />
               </MenuItem>
             ]

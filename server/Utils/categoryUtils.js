@@ -3,22 +3,22 @@ import CategoryModel from '../models/CategoryModel.js';
 const defaultCategories = [
 
   // expense categories
-  { name: 'Rent' },
-  { name: 'Utilities (Electricity, Water, Gas, Internet)' },
-  { name: 'Groceries' },
-  { name: 'Food & drinks' },
-  { name: 'Shopping' },
-  { name: 'Entertainment' },
-  { name: 'Health/Medical' },
-  { name: 'Travel' },
-  { name: 'Gas' },
-  { name: 'Miscellaneous' },
+  { name: 'Rent', type: 'expense' },
+  { name: 'Utilities (Electricity, Water, Gas, Internet)', type: 'expense' },
+  { name: 'Groceries', type: 'expense' },
+  { name: 'Food & drinks', type: 'expense' },
+  { name: 'Shopping', type: 'expense' },
+  { name: 'Entertainment', type: 'expense' },
+  { name: 'Health/Medical', type: 'expense' },
+  { name: 'Travel', type: 'expense' },
+  { name: 'Gas', type: 'expense' },
+  { name: 'Miscellaneous', type: 'expense' },
 
   // income categories
-  { name: 'Salary' },
-  { name: 'Bonus' },
-  { name: 'Gift' },
-  { name: 'Investment' },
+  { name: 'Salary', type: 'income' },
+  { name: 'Bonus', type: 'income' },
+  { name: 'Gift', type: 'income' },
+  { name: 'Investment', type: 'income' },
 
 ];
 

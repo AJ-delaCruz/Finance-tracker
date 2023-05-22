@@ -27,7 +27,6 @@ const App = () => {
 
     const { currentUser } = useContext(AuthContext) //access the shared state
     // console.log("first load " + loading);
-    console.log("Current user:", currentUser);
 
     // if (loading) {
     //     return <div>Loading...</div>; // Display a loading indicator while waiting
@@ -62,7 +61,7 @@ const App = () => {
         // console.log('loading :' + loading)
 
 
-        console.log('AUTH: ' + currentUser);
+        // console.log('AUTH: ' + currentUser);
         // console.log(currentUser);
         if (!currentUser) {
             console.log('Not CURRENT USER: ' + currentUser);
