@@ -3,7 +3,6 @@ import express from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { Server } from 'socket.io';
 
 import userRoute from './routes/user.js';
 import accountRoute from './routes/account.js';
@@ -13,6 +12,7 @@ import budgetRoute from './routes/budget.js';
 import goalRoute from './routes/goal.js';
 import billRoute from './routes/bills.js';
 import chatbotRoute from './routes/chatbot.js';
+import { initializeIo } from './Utils/websocket.js';
 
 dotenv.config();
 
@@ -20,12 +20,7 @@ const app = express(); // create an express app
 
 // create a Socket.IO server for websocket and attach to http server
 const http = createServer(app); // create http server
-const io = new Server(http, {
-  // handle websocket connection
-  cors: {
-    origin: [process.env.frontendURL, 'http://localhost:4000'],
-  },
-});
+initializeIo(http); // Initialize Socket.IO with the HTTP server
 
 app.use(cors({
   // handle http API request
@@ -65,21 +60,9 @@ app.use('/goal', goalRoute);
 app.use('/bill', billRoute);
 app.use('/chat', chatbotRoute);
 
-// Handle WebSocket connections
-io.on('connection', (socket) => {
-  console.log('Websocket connected');
-
-  // socket.emit('notificationEvent', { message: 'Goal success!' });
-  // socket.emit('notificationEvent', { message: 'Budget success!' });
-
-  socket.on('disconnect', () => {
-    console.log('Websocket disconnected');
-  });
-});
 
 // start the HTTP server for both Express app and Socket.IO server
 http.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-export { io };

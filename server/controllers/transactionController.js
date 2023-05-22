@@ -3,9 +3,10 @@ import AccountModel from '../models/AccountModel.js';
 import BudgetModel from '../models/BudgetModel.js';
 import GoalModel from '../models/GoalModel.js';
 import UserModel from '../models/UserModel.js';
-import { io } from '../index.js';
+import { socketIO } from '../Utils/websocket.js';
 
 const addTransaction = async (req, res) => {
+  const io = socketIO();
   const {
     // required in transactions
     account, category, type, amount,
@@ -77,13 +78,14 @@ const addTransaction = async (req, res) => {
       );
       // console.log(updatedGoal);
       console.log('goal updated');
+      // console.log(io.sockets.sockets);
 
       // send real time notification if goal is completed
       if (updatedGoal.currentAmount >= updatedGoal.targetAmount) {
         io.emit('notificationEvent', {
           user: userId,
           goal: updatedGoal,
-          message: `Congratulations, Goal: ${updatedGoal.name} achieved!`,
+          message: `Congratulations. Goal: ${updatedGoal.name} achieved!`,
         });
       }
     }
