@@ -44,7 +44,8 @@ const AddTransactionModal = ({ open, handleClose, handleAddedTransaction }) => {
     };
 
     //store the new transaction to db
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
             const token = localStorage.getItem('token');
             const headers = {

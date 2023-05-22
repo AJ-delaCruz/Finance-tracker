@@ -21,7 +21,8 @@ const AccountModal = ({ open, handleClose, handleAddedAccount }) => {
         setAccount({ ...account, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
             const token = localStorage.getItem("token");
             const headers = {

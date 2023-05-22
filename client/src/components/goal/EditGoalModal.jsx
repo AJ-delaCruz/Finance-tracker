@@ -16,7 +16,9 @@ const EditGoalModal = ({ open, handleClose, goal, updateGoal }) => {
         setEditedGoal({ ...editedGoal, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         console.log(goal._id);
         try {
             const token = localStorage.getItem("token");

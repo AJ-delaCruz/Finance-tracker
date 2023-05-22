@@ -48,7 +48,7 @@ const Goal = () => {
     //menu item for edit or remove goal
     const [anchorEl, setAnchorEl] = useState(null);
     const handleOpenMenu = (e, goal) => {
-        // setEditGoal(goal);
+        setSelectedGoal(goal);
         setAnchorEl(e.currentTarget);
     };
     const handleCloseMenu = () => {
@@ -67,7 +67,7 @@ const Goal = () => {
     };
 
     const handleEditModalOpen = (goal) => {
-        setSelectedGoal(goal);
+        // setSelectedGoal(goal);
         setEditModalOpen(true);
 
         //close menu item

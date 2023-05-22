@@ -22,7 +22,9 @@ const AddBudgetModal = ({ open, handleClose, handleAddedBudget }) => {
         setBudget({ ...budget, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         try {
             const token = localStorage.getItem("token");
             const headers = {
