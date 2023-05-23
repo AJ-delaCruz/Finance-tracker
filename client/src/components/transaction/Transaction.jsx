@@ -103,8 +103,8 @@ const Transaction = () => {
   const { t } = useTranslation();
 
   //sort
-  const [orderBy, setOrderBy] = useState('null');
-  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('createdAt');
+  const [order, setOrder] = useState('desc');
 
 
 

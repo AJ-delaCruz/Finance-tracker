@@ -67,9 +67,10 @@ const addTransaction = async (req, res) => {
 
     // Adjust user goal if it exists
     const user = await UserModel.findOne(userId);
-    if (user.currentGoal) {
-      // increment goal currentAmount if account type is debit/savings else decrement for loan/CC
-      const goalUpdate = { $inc: { currentAmount: updatedAccount.type === 'Checking' || updatedAccount.type === 'Savings' ? amount : -amount } };
+    // if (user.currentGoal) {
+    if (user.currentGoal && (updatedAccount.type === 'Checking' || updatedAccount.type === 'Savings')) {
+      // increment goal currentAmount if account type is debit/savings else decrement
+      const goalUpdate = { $inc: { currentAmount: type === 'income' ? amount : -amount } };
       // await GoalModel.findByIdAndUpdate(user.currentGoal, goalUpdate);
       const updatedGoal = await GoalModel.findByIdAndUpdate(
         user.currentGoal,
