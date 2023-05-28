@@ -97,6 +97,24 @@ const Bill = () => {
         }
     };
 
+    //delete bill
+    const handleDeleteBill = async (billId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+
+            console.log(billId);
+            await axios.delete(`${backendUrl}/bill/${billId}`, { headers });
+
+            // Update the bills list
+            getBills();
+        } catch (error) {
+            console.error("Error deleting bill:", error);
+        }
+    };
+
     useEffect(() => {
         getBills();
     }, []);
@@ -260,11 +278,7 @@ const Bill = () => {
                                     </TableCell>
 
 
-                                    {/* <TableCell>
-                                        <Delete
-                                        // onClick={() => handleDelete(bill._id)}
-                                        />
-                                    </TableCell> */}
+                                  
                                     <TableCell>
                                         <IconButton onClick={(e) => handleOpenMenu(e, bill)}>
                                             <MoreVert />
@@ -279,7 +293,7 @@ const Bill = () => {
                                                 <ListItemText primary="Edit" />
                                             </MenuItem>
                                             <MenuItem
-                                            // onClick={() => handleDelete(bill)}
+                                            onClick={() => handleDeleteBill(bill._id)}
                                             >
                                                 <ListItemIcon>
                                                     <Delete fontSize="small" />
