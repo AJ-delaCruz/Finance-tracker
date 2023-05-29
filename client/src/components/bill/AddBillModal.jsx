@@ -45,7 +45,7 @@ const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
             };
 
             await axios.post(`${backendUrl}/bill/create`, bill, { headers });
-            console.log(bill)
+            // console.log(bill)
 
             if (handleAddedBill) {
                 handleAddedBill();
