@@ -74,8 +74,28 @@ const updateBudget = async (req, res) => {
 };
 
 const removeBudget = async (req, res) => {
+  const { budgetId } = req.params;
+  const userId = req.user._id;
+  // console.log(budgetId);
+  try {
+    const budget = await BudgetModel.findById(budgetId);
+    if (!budget) {
+      res.status(404).json({ message: 'Budget not found' });
+      return;
+    }
+    // check for authentication
+    if (budget.userId.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to remove this budget.' });
+      return;
+    }
+    // Model.prototype.deleteOne()
+    await budget.deleteOne();
 
-  // todo
+    res.status(200).json(budget);
+  } catch (error) {
+    // console.error('Error deleting budget:', error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export {

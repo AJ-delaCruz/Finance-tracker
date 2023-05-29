@@ -29,6 +29,7 @@ const Budget = () => {
     const [budgets, setBudgets] = useState([]);
     const { t } = useTranslation();
 
+    const [selectedBudget, setSelectedBudget] = useState(null);
 
     const handleOpenModal = () => {
         setModalOpen(true);
@@ -41,7 +42,6 @@ const Budget = () => {
     //edit menu items
     const [anchorEl, setAnchorEl] = useState(null);
     const [editModalOpen, setEditModalOpen] = useState(false); //todo
-    const [selectedBudget, setSelectedBudget] = useState(null);
 
     //pagination/sort
     const [page, setPage] = useState(0);
@@ -52,6 +52,7 @@ const Budget = () => {
 
     const handleOpenMenu = (e, budget) => {
         setAnchorEl(e.currentTarget);
+        setSelectedBudget(budget);
     };
 
     const handleCloseMenu = () => {
@@ -70,12 +71,6 @@ const Budget = () => {
         setSelectedBudget(null);
     };
 
-    const handleDelete = (budget) => {
-        // TODO
-        handleCloseMenu();
-    };
-
-
     const getBudgets = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -89,6 +84,25 @@ const Budget = () => {
             // console.log(response.data);
         } catch (error) {
             console.error("Error fetching budgets:", error);
+        }
+    };
+
+    //delete budget
+    const handleDelete = async (budgetId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+
+            // console.log(budgetId);
+            await axios.delete(`${backendUrl}/budget/${budgetId}`, { headers });
+
+            // Update the budget list
+            getBudgets();
+            handleCloseMenu();
+        } catch (error) {
+            console.error("Error deleting budget:", error);
         }
     };
 
@@ -288,7 +302,7 @@ const Budget = () => {
                                                     </ListItemIcon>
                                                     <ListItemText primary="Edit" />
                                                 </MenuItem>
-                                                <MenuItem onClick={() => handleDelete(budget)}>
+                                                <MenuItem onClick={() => handleDelete(selectedBudget._id)}>
                                                     <ListItemIcon>
                                                         <Delete fontSize="small" />
                                                     </ListItemIcon>

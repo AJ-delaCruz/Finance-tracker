@@ -96,9 +96,31 @@ const Goal = () => {
         }
     };
 
+
+    //delete goal
+    const handleDelete = async (goalId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+
+            console.log(goalId);
+            await axios.delete(`${backendUrl}/goal/${goalId}`, { headers });
+
+            // Update the goal list
+            getGoals();
+            handleCloseMenu();
+        } catch (error) {
+            console.error("Error deleting goal:", error);
+        }
+    };
+
+
     useEffect(() => {
         getGoals();
     }, []);
+
     const calculateGoalProgress = (currentAmount, targetAmount) => {
         return (currentAmount / targetAmount) * 100;
     };
@@ -214,7 +236,7 @@ const Goal = () => {
 
                                                 {/* delete */}
                                                 <MenuItem
-                                                // onClick={() => handleDelete(selectedGoal)}
+                                                onClick={() => handleDelete(selectedGoal._id)}
                                                 >
                                                     <ListItemIcon>
                                                         <Delete fontSize="small" />

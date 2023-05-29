@@ -47,16 +47,18 @@ const Bill = () => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedBill, setSelectedBill] = useState(null);
+
+    //menu item for edit or remove bill
     const handleOpenMenu = (e, bill) => {
-        setSelectedBill(bill);
         setAnchorEl(e.currentTarget);
+        setSelectedBill(bill);
     };
 
     const handleCloseMenu = () => {
-        setSelectedBill(null);
         setAnchorEl(null);
     };
 
+        //modal
     const handleOpenModal = () => {
         setModalOpen(true);
     };
@@ -105,11 +107,12 @@ const Bill = () => {
                 Authorization: `Bearer ${token}`,
             };
 
-            console.log(billId);
+            // console.log(billId);
             await axios.delete(`${backendUrl}/bill/${billId}`, { headers });
 
             // Update the bills list
             getBills();
+            handleCloseMenu();
         } catch (error) {
             console.error("Error deleting bill:", error);
         }
@@ -293,7 +296,7 @@ const Bill = () => {
                                                 <ListItemText primary="Edit" />
                                             </MenuItem>
                                             <MenuItem
-                                            onClick={() => handleDeleteBill(bill._id)}
+                                            onClick={() => handleDeleteBill(selectedBill._id)}
                                             >
                                                 <ListItemIcon>
                                                     <Delete fontSize="small" />

@@ -67,7 +67,7 @@ const deleteBill = async (req, res) => {
     }
     // check for authentication
     if (bill.userId.toString() !== userId.toString()) {
-      res.status(403).json({ message: 'You do not have permission to update this bill.' });
+      res.status(403).json({ message: 'You do not have permission to remove this bill.' });
       return;
     }
     // Model.prototype.deleteOne()

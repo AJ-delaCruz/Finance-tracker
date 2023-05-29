@@ -169,11 +169,31 @@ const getTransactionByType = async (req, res) => {
 //     // todo
 // };
 //
-// const removeTransaction = async (req, res) => {
-//
-//     // todo
-// };
+const removeTransaction = async (req, res) => {
+  const { transactionId } = req.params;
+  const userId = req.user._id;
+  // console.log(transactionId);
+  try {
+    const transaction = await TransactionModel.findById(transactionId);
+    if (!transaction) {
+      res.status(404).json({ message: 'Transaction not found' });
+      return;
+    }
+    // check for authentication
+    if (transaction.userId.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to remove this transaction.' });
+      return;
+    }
+    // Model.prototype.deleteOne()
+    await transaction.deleteOne();
+
+    res.status(200).json(transaction);
+  } catch (error) {
+    // console.error('Error deleting transaction:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export {
-  addTransaction, getAllTransactions, getTransactionByType,
+  addTransaction, getAllTransactions, getTransactionByType, removeTransaction,
 };

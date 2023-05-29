@@ -108,11 +108,13 @@ const Transaction = () => {
 
 
 
-  //menu item for edit or remove goal
+  //menu item for edit or remove transaction
   const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+
   const handleOpenMenu = (e, transaction) => {
-    // setEditTransaction(goal);
     setAnchorEl(e.currentTarget);
+    setSelectedTransaction(transaction);
   };
   const handleCloseMenu = () => {
     // setEditTransaction(null);
@@ -140,6 +142,7 @@ const Transaction = () => {
 
       const response = await axios.get(`${backendUrl}/transaction/byCategory?type=${type}`, { headers });
       setTransactions(response.data);
+      // console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -161,19 +164,40 @@ const Transaction = () => {
 
 
       setAllTransactions(transactionsResponse.data);
-      //console.log(transactionsResponse.data);
+      // console.log(transactionsResponse.data);
     } catch (error) {
       console.error(error);
     }
   };
 
+
+    //delete transaction
+    const handleDelete = async (transactionId) => {
+      try {
+          const token = localStorage.getItem("token");
+          const headers = {
+              Authorization: `Bearer ${token}`,
+          };
+
+          // console.log(transactionId);
+          await axios.delete(`${backendUrl}/transaction/${transactionId}`, { headers });
+
+          // Update the transaction list
+          // fetchAllTransactions();
+          getTransactions();
+          handleCloseMenu();
+      } catch (error) {
+          console.error("Error deleting transaction:", error);
+      }
+  };
+
   useEffect(() => {
     getTransactions();
-  }, [type]);
+  }, []);
 
   useEffect(() => {
     fetchAllTransactions();
-  }, [type]);
+  }, [transactions]);
 
 
   useEffect(() => {
@@ -422,7 +446,7 @@ const Transaction = () => {
 
                         {/* delete */}
                         <MenuItem
-                        // onClick={() => handleDelete(selectedGoal)}
+                        onClick={() => handleDelete(selectedTransaction._id)}
                         >
                           <ListItemIcon>
                             <Delete fontSize="small" />

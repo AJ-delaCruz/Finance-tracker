@@ -60,8 +60,29 @@ const updateGoal = async (req, res) => {
 };
 
 const removeGoal = async (req, res) => {
+  const { goalId } = req.params;
+  const userId = req.user._id;
+  // console.log(goalId);
+  // console.log(userId);
+  try {
+    const goal = await GoalModel.findById(goalId);
+    if (!goal) {
+      res.status(404).json({ message: 'Goal not found' });
+      return;
+    }
+    // check for authentication
+    if (goal.user.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to remove this goal.' });
+      return;
+    }
+    // Model.prototype.deleteOne()
+    await goal.deleteOne();
 
-  // todo
+    res.status(200).json(goal);
+  } catch (error) {
+    // console.error('Error deleting goal:', error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export {
