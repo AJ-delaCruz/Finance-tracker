@@ -164,11 +164,36 @@ const getTransactionByType = async (req, res) => {
   }
 };
 
-// const updateTransaction = async (req, res) => {
-//
-//     // todo
-// };
-//
+const updateTransaction = async (req, res) => {
+  const { transactionId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const transaction = await TransactionModel.findById(transactionId);
+
+    if (!transaction) {
+      res.status(404).json({ message: 'transaction not found' });
+      return;
+    }
+
+    // check for authentication
+    if (transaction.userId.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to update this transaction.' });
+      return;
+    }
+    // update transaction
+    const updatedTransaction = await TransactionModel.findByIdAndUpdate(
+      transactionId,
+      req.body,
+      { new: true },
+    );
+    // console.log(updatedTransaction);
+    res.status(200).json(updatedTransaction);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const removeTransaction = async (req, res) => {
   const { transactionId } = req.params;
   const userId = req.user._id;
@@ -195,5 +220,5 @@ const removeTransaction = async (req, res) => {
 };
 
 export {
-  addTransaction, getAllTransactions, getTransactionByType, removeTransaction,
+  addTransaction, getAllTransactions, getTransactionByType, removeTransaction, updateTransaction,
 };

@@ -33,6 +33,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import { MoreVert, Edit, Delete } from '@mui/icons-material';
+import EditTransactionModal from './EditTransactionModal';
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -110,6 +111,7 @@ const Transaction = () => {
 
   //menu item for edit or remove transaction
   const [anchorEl, setAnchorEl] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const handleOpenMenu = (e, transaction) => {
@@ -122,6 +124,7 @@ const Transaction = () => {
   };
 
 
+  //add modals
   const handleOpenModal = () => {
     setModalOpen(true);
   };
@@ -130,6 +133,19 @@ const Transaction = () => {
     setModalOpen(false);
   };
 
+  //edit modal
+  const handleEditModalOpen = (transaction) => {
+    setEditModalOpen(true);
+
+    //close menu item
+    setAnchorEl(null);
+  };
+
+  const handleEditModalClose = () => {
+    // console.log("Closing modal");
+    setEditModalOpen(false);
+    setSelectedTransaction(null);
+  };
 
 
   //retrieve transactions by type (income or expense)
@@ -171,24 +187,24 @@ const Transaction = () => {
   };
 
 
-    //delete transaction
-    const handleDelete = async (transactionId) => {
-      try {
-          const token = localStorage.getItem("token");
-          const headers = {
-              Authorization: `Bearer ${token}`,
-          };
+  //delete transaction
+  const handleDelete = async (transactionId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
 
-          // console.log(transactionId);
-          await axios.delete(`${backendUrl}/transaction/${transactionId}`, { headers });
+      // console.log(transactionId);
+      await axios.delete(`${backendUrl}/transaction/${transactionId}`, { headers });
 
-          // Update the transaction list
-          // fetchAllTransactions();
-          getTransactions();
-          handleCloseMenu();
-      } catch (error) {
-          console.error("Error deleting transaction:", error);
-      }
+      // Update the transaction list
+      // fetchAllTransactions();
+      getTransactions();
+      handleCloseMenu();
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+    }
   };
 
   useEffect(() => {
@@ -436,7 +452,7 @@ const Transaction = () => {
 
                         {/* edit   */}
                         <MenuItem
-                        // onClick={() => handleEditModalOpen(transaction)}
+                        onClick={() => handleEditModalOpen(transaction)}
                         >
                           <ListItemIcon>
                             <Edit fontSize="small" />
@@ -446,7 +462,7 @@ const Transaction = () => {
 
                         {/* delete */}
                         <MenuItem
-                        onClick={() => handleDelete(selectedTransaction._id)}
+                          onClick={() => handleDelete(selectedTransaction._id)}
                         >
                           <ListItemIcon>
                             <Delete fontSize="small" />
@@ -458,6 +474,17 @@ const Transaction = () => {
                   </TableRow>
 
                 ))}
+
+              {editModalOpen && (<EditTransactionModal
+                open={editModalOpen}
+                handleClose={handleEditModalClose}
+                transaction={selectedTransaction}
+                updateEditedTransaction={getTransactions}
+
+                // transactionToEdit={selectedTransaction}
+                // handleEditedTransaction={getTransactions}
+              />)}
+
             </TableBody>
             <TableFooter>
               <TableRow>

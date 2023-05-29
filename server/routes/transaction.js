@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  addTransaction, getAllTransactions, getTransactionByType, removeTransaction,
+  addTransaction, getAllTransactions, getTransactionByType, removeTransaction, updateTransaction,
 } from '../controllers/transactionController.js';
 
 import { checkAuth } from '../Utils/passport.js'; // to get userId
@@ -10,4 +10,5 @@ router.post('/create', checkAuth, addTransaction);
 router.get('/byCategory', checkAuth, getTransactionByType);
 router.get('/all', checkAuth, getAllTransactions);
 router.delete('/:transactionId', checkAuth, removeTransaction);
+router.put('/update/:transactionId', checkAuth, updateTransaction);
 export default router;
