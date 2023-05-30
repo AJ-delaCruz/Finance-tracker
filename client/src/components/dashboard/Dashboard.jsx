@@ -5,7 +5,8 @@ import { backendUrl } from '../../config';
 //import { NextSeo } from "next-seo";
 import { useTranslation } from 'react-i18next';
 import { Chart } from 'react-google-charts';
-
+import { CircularProgress } from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const Dashboard = () => {
   const [accounts, setAccounts] = useState([]);
@@ -14,36 +15,36 @@ const Dashboard = () => {
   const [goals, setGoals] = useState([]);
   const token = localStorage.getItem('token');
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+
 
   const data = [
-    ["Summary", " $", { role: "style" }],
-    ["Savings & Checking", calculateTotalSavingsAndChecking(accounts), "#658eaa"],
-    ["Total Debt", calculateTotalDebt(accounts), "#8b65aa"],
-    ["Net Worth", calculateNetWorth(calculateTotalSavingsAndChecking(accounts), calculateTotalDebt(accounts)), "#6566aa"],
+    // {
+    //   name: "Savings & Checking", value: calculateTotalSavingsAndChecking(accounts),
+    // },
+    {
+      name: "Total Debt (Negative)", Debt: Math.abs(calculateTotalDebt(accounts)),
+    },
+    {
+      name: "Net Worth", Net: calculateNetWorth(calculateTotalSavingsAndChecking(accounts), calculateTotalDebt(accounts)),
+    },
   ];
 
-
-  const options = {
-    chart: {
-      title: `Account Overview`,
-      //subtitle: 'Savings,Debt and Net Worth',
-      is3D: true,
-    },
-  };
-
-
   useEffect(() => {
-    fetchAccounts();
     fetchTransactions();
 
 
     getBudgets();
     getGoals();
+    fetchAccounts();
   }, []);
 
 
   const fetchAccounts = async () => {
+
     try {
+      setLoading(true);
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
@@ -52,11 +53,13 @@ const Dashboard = () => {
         axios.get(`${backendUrl}/account/all`, { headers }),
       ]);
 
-
       // console.log(accountsResponse.data);
       setAccounts(accountsResponse.data);
     } catch (error) {
       console.error(error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -121,86 +124,94 @@ const Dashboard = () => {
        description="Track your personal finances with ease using our finance tracker app. Manage your budget, expenses, and income all in one place."
      /> */}
       <div className='dashboard'>
-        {/* <h2>Dashboard</h2> */}
-        <div className='overview'>
-          <h3 className='tile-heading'>Account Overview</h3>
-          <Chart chartType="ColumnChart" width="100%" height="320px" data={data} />
-
-        </div>
-
-
-        {/* <div className="overview">
-               <h3>Overview</h3>
-              
-               <p>Checking & Saving: {calculateTotalSavingsAndChecking(accounts)}</p>
-               <p>Total Debt: {calculateTotalDebt(accounts)}</p>
-               <p>Net worth: {calculateNetWorth(calculateTotalSavingsAndChecking(accounts), calculateTotalDebt(accounts))}</p>
-           </div> */}
-
-
-        <div className='account-summary'>
-          {/* Display the list of accounts with their respective balances */}
-          <h3 className='tile-heading'>Account Summary</h3>
-
-
-          {accounts.map((account) => (
-            <div className='account-tile' key={account._id}>
-              {t(account.name)} - $ {account.balance}
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            {/* <h2>Dashboard</h2> */}
+            <div className='overview'>
+              <h3 className='tile-heading'>Account Overview</h3>
+              {/* <Chart chartType="ColumnChart" width="100%" height="320px" data={data} /> */}
+              {/* {loading ? (
+            <CircularProgress />
+          ) : ( */}
+              <BarChart width={500} height={300} data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Debt" fill="#B30000" />
+                <Bar dataKey="Net" fill="#82ca9d" />
+              </BarChart>
             </div>
-          ))}
-        </div>
 
 
-        <div className='transactions'>
-          {/* Display recent transactions */}
-          <h3 className='tile-heading'>Recent Transactions</h3>
+            <div className='account-summary'>
+              {/* Display the list of accounts with their respective balances */}
+              <h3 className='tile-heading'>Account Summary</h3>
 
 
-          {transactions.slice(-5).reverse().map((transaction) => {
-            const date = new Date(transaction.createdAt);
-            const month = date.toLocaleString('default', { month: 'long' });
-            const day = date.getDate();
-            const year = date.getFullYear();
-            const formattedDate = `${month} ${day}, ${year}`;
-
-
-            return (
-              <div className='account-tile' key={transaction._id}>
-                {t(formattedDate)}: {t(transaction.description)} -{' '}
-                ${transaction.amount}
-              </div>
-            );
-          })}
-        </div>
-
-
-        <div className='budget'>
-          {/* Display the budget overview with progress bars */}
-          <h3 className='tile-heading'>Budget</h3>
-          {budgets.slice(-5).reverse().map((budget) => {
-            // const spent = calculateSpentAmount(budget, transactions);
-            return (
-              <div key={budget._id} className='budget-item account-tile'>
-                <p>{t(budget.name)}</p>
-                <progress value={budget.amount} max={budget.limit}></progress>
-              </div>
-            );
-          })}
-        </div>
-
-
-        <div className='goals'>
-          {/* Display the user's financial goals */}
-          <h3 className='tile-heading'>Goals</h3>
-          {goals.slice(-5).reverse().map((goal) => (
-            <div key={goal._id} className='goal-item account-tile'>
-              <p>{t(goal.name)}</p>
-              <progress
-                value={goal.currentAmount}
-                max={goal.targetAmount}></progress>
+              {accounts.map((account) => (
+                <div className='account-tile' key={account._id}>
+                  {t(account.name)} - $ {account.balance}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+
+
+            <div className='transactions'>
+              {/* Display recent transactions */}
+              <h3 className='tile-heading'>Recent Transactions</h3>
+
+
+              {transactions.slice(-5).reverse().map((transaction) => {
+                const date = new Date(transaction.createdAt);
+                const month = date.toLocaleString('default', { month: 'long' });
+                const day = date.getDate();
+                const year = date.getFullYear();
+                const formattedDate = `${month} ${day}, ${year}`;
+
+
+                return (
+                  <div className='account-tile' key={transaction._id}>
+                    {t(formattedDate)}: {t(transaction.description)} -{' '}
+                    ${transaction.amount}
+                  </div>
+                );
+              })}
+            </div>
+
+
+            <div className='budget'>
+              {/* Display the budget overview with progress bars */}
+              <h3 className='tile-heading'>Budget</h3>
+              {budgets.slice(-5).reverse().map((budget) => {
+                // const spent = calculateSpentAmount(budget, transactions);
+                return (
+                  <div key={budget._id} className='budget-item account-tile'>
+                    <p>{t(budget.name)}</p>
+                    <progress value={budget.amount} max={budget.limit}></progress>
+                  </div>
+                );
+              })}
+            </div>
+
+
+            <div className='goals'>
+              {/* Display the user's financial goals */}
+              <h3 className='tile-heading'>Goals</h3>
+              {goals.slice(-5).reverse().map((goal) => (
+                <div key={goal._id} className='goal-item account-tile'>
+                  <p>{t(goal.name)}</p>
+                  <progress
+                    value={goal.currentAmount}
+                    max={goal.targetAmount}></progress>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </>
   );
@@ -229,7 +240,7 @@ const calculateTotalDebt = (accounts) => {
 
 
 const calculateNetWorth = (totalSavingsAndChecking, totalDebt) => {
-  return totalSavingsAndChecking - totalDebt;
+  return totalSavingsAndChecking + totalDebt;
 };
 
 
