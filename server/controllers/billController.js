@@ -53,6 +53,35 @@ const updateBillPayment = async (req, res) => {
   }
 };
 
+const updateBill = async (req, res) => {
+  const { billId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const bill = await BillModel.findById(billId);
+
+    if (!bill) {
+      res.status(404).json({ message: 'Bill not found' });
+      return;
+    }
+
+    // check for authentication
+    if (bill.userId.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to update this bill.' });
+      return;
+    }
+    // update bill
+    const updatedBill = await BillModel.findByIdAndUpdate(
+      billId,
+      req.body,
+      { new: true },
+    );
+    res.status(200).json(updatedBill);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const deleteBill = async (req, res) => {
   const { billId } = req.params;
   const userId = req.user._id;
@@ -81,5 +110,5 @@ const deleteBill = async (req, res) => {
 };
 
 export {
-  createBill, getAllBills, updateBillPayment, deleteBill,
+  createBill, getAllBills, updateBillPayment, deleteBill, updateBill,
 };

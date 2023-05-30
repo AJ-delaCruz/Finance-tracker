@@ -31,6 +31,7 @@ import { Delete, Edit, MoreVert } from '@mui/icons-material';
 
 
 import './bill.scss';
+import EditBillModal from './EditBillModal';
 
 const Bill = () => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -47,6 +48,7 @@ const Bill = () => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedBill, setSelectedBill] = useState(null);
+    const [editModalOpen, setEditModalOpen] = useState(false);
 
     //menu item for edit or remove bill
     const handleOpenMenu = (e, bill) => {
@@ -58,7 +60,21 @@ const Bill = () => {
         setAnchorEl(null);
     };
 
-        //modal
+
+    const handleEditModalOpen = (bill) => {
+        setEditModalOpen(true);
+
+        //close menu item
+        setAnchorEl(null);
+    };
+
+    const handleEditModalClose = () => {
+        // console.log("Closing modal");
+        setEditModalOpen(false);
+        setSelectedBill(null);
+    };
+
+    //modal
     const handleOpenModal = () => {
         setModalOpen(true);
     };
@@ -281,22 +297,22 @@ const Bill = () => {
                                     </TableCell>
 
 
-                                  
+
                                     <TableCell>
                                         <IconButton onClick={(e) => handleOpenMenu(e, bill)}>
                                             <MoreVert />
                                         </IconButton>
                                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                                            <MenuItem
-                                            //  onClick={() => handleEdit(bill)}
-                                            >
+
+                                            {/* edit   */}
+                                            <MenuItem onClick={() => handleEditModalOpen(bill)} >
                                                 <ListItemIcon>
                                                     <Edit fontSize="small" />
                                                 </ListItemIcon>
                                                 <ListItemText primary="Edit" />
                                             </MenuItem>
                                             <MenuItem
-                                            onClick={() => handleDeleteBill(selectedBill._id)}
+                                                onClick={() => handleDeleteBill(selectedBill._id)}
                                             >
                                                 <ListItemIcon>
                                                     <Delete fontSize="small" />
@@ -308,6 +324,13 @@ const Bill = () => {
 
                                 </TableRow>
                             ))}
+
+                            {editModalOpen && (<EditBillModal
+                                open={editModalOpen}
+                                handleClose={handleEditModalClose}
+                                bill={selectedBill}
+                                updateEditedBill={getBills}
+                            />)}
                         </TableBody>
                     </Table>
                     <TablePagination

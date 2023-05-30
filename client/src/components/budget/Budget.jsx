@@ -23,6 +23,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { MoreVert, Edit, Delete } from "@mui/icons-material";
 import { GoogleCharts } from 'google-charts';
+import EditBudgetModal from "./EditBudgetModal";
 
 const Budget = () => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -60,7 +61,6 @@ const Budget = () => {
     };
 
     const handleEditModalOpen = (budget) => {
-        setSelectedBudget(budget);
         setEditModalOpen(true);
         setAnchorEl(null);
     };
@@ -312,6 +312,13 @@ const Budget = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))}
+
+                            {editModalOpen && (<EditBudgetModal
+                                open={editModalOpen}
+                                handleClose={handleEditModalClose}
+                                budget={selectedBudget}
+                                updateEditedBudget={getBudgets}
+                            />)}
                         </TableBody>
                     </Table>
 
