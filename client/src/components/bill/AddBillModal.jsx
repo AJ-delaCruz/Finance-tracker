@@ -16,9 +16,11 @@ const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        //fix Date object as as midnight in the user's local time zone instead of UTC
+        let finalValue = name === 'dueDate' ? value + 'T00:00' : value;
 
-        setBill({ ...bill, [e.target.name]: e.target.value });
-        validateField(name, value);
+        setBill({ ...bill, [e.target.name]: finalValue });
+        validateField(name, finalValue);
 
     };
 
@@ -109,7 +111,11 @@ const AddBillsModal = ({ open, handleClose, handleAddedBill }) => {
                 />
             </DialogContent>
 
-            <DialogActions>
+            <DialogActions style={{
+                display: 'flex',
+                justifyContent: 'space-between'
+
+            }}>
                 <Button onClick={handleSubmit} data-testid="add-bill-button">Add</Button>
                 <Button onClick={handleClose}>Cancel</Button>
             </DialogActions>

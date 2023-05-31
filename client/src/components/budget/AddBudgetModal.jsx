@@ -19,7 +19,10 @@ const AddBudgetModal = ({ open, handleClose, handleAddedBudget }) => {
     const [categories, setCategories] = useState([]);
 
     const handleChange = (e) => {
-        setBudget({ ...budget, [e.target.name]: e.target.value });
+        //fix Date object as as midnight in the user's local time zone instead of UTC
+        let finalValue = e.target.name === 'startDate' || e.target.name === 'endDate' ? e.target.value + 'T00:00' : e.target.value;
+
+        setBudget({ ...budget, [e.target.name]: finalValue });
     };
 
     const handleSubmit = async (e) => {

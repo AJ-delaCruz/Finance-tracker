@@ -161,11 +161,18 @@ const AddTransactionModal = ({ open, handleClose, handleAddedTransaction }) => {
                             onChange={handleChange}
                             label="Category"
                         >
-                            {expenseCategories.map((category) => (
+                            {expenseCategories.length > 0 ? expenseCategories.map((category) => (
                                 <MenuItem key={category._id} value={category._id}>
                                     {category.name}
                                 </MenuItem>
-                            ))}
+                            ))
+                             : categories.map((category) => (
+                                <MenuItem key={category._id} value={category._id}>
+                                    {category.name}
+                                </MenuItem>
+                            ))
+                            
+                            }
                         </Select>
                     </FormControl>
 

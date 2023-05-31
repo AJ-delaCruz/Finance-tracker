@@ -75,7 +75,7 @@ const Goal = () => {
     };
 
     const handleEditModalClose = () => {
-        console.log("Closing modal");
+        // console.log("Closing modal");
         setEditModalOpen(false);
         setSelectedGoal(null);
     };
@@ -105,7 +105,7 @@ const Goal = () => {
                 Authorization: `Bearer ${token}`,
             };
 
-            console.log(goalId);
+            // console.log(goalId);
             await axios.delete(`${backendUrl}/goal/${goalId}`, { headers });
 
             // Update the goal list
@@ -209,7 +209,13 @@ const Goal = () => {
                                         <TableCell className='center-align'>${goal.targetAmount}</TableCell>
                                         {/* <TableCell>{goal.targetDate}</TableCell> */}
                                         <TableCell className='center-align'>
-                                            {(goal.targetDate).slice(0, 10)}
+                                            {/* {(goal.targetDate).slice(0, 10)} */}
+                                            {/* {(goal.targetDate).slice(0, 10).split('-').reverse().join('-')} */}
+                                            {/* {goal.targetDate.split('-').reverse().join('-')} */}
+                                            {/* {goal.targetDate.slice(5, 7) + '-' + goal.targetDate.slice(8, 10) + '-' + goal.targetDate.slice(0, 4)} */}
+                                            {new Date(goal.targetDate).toLocaleDateString('en-US', { timeZone: 'UTC' })}
+
+
                                         </TableCell>
 
                                         <TableCell className='center-align'>
@@ -236,7 +242,7 @@ const Goal = () => {
 
                                                 {/* delete */}
                                                 <MenuItem
-                                                onClick={() => handleDelete(selectedGoal._id)}
+                                                    onClick={() => handleDelete(selectedGoal._id)}
                                                 >
                                                     <ListItemIcon>
                                                         <Delete fontSize="small" />

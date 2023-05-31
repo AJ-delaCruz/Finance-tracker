@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 
 const EditGoalModal = ({ open, handleClose, goal, updateGoal }) => {
     const [editedGoal, setEditedGoal] = useState(goal);
+
     const handleChange = (e) => {
         setEditedGoal({ ...editedGoal, [e.target.name]: e.target.value });
     };
@@ -19,14 +20,14 @@ const EditGoalModal = ({ open, handleClose, goal, updateGoal }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(goal._id);
+        // console.log(goal._id);
         try {
             const token = localStorage.getItem("token");
             const headers = {
                 Authorization: `Bearer ${token}`,
             };
 
-            console.log(editedGoal);
+            // console.log(editedGoal);
             await axios.put(`${backendUrl}/goal/update/${goal._id}`, editedGoal, { headers });
             await updateGoal();
             handleClose();
@@ -97,8 +98,9 @@ const EditGoalModal = ({ open, handleClose, goal, updateGoal }) => {
                 justifyContent: 'space-between'
 
             }}>
-                <Button onClick={handleClose}>Cancel</Button>
+             
                 <Button onClick={handleSubmit}>Save</Button>
+                <Button onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );
