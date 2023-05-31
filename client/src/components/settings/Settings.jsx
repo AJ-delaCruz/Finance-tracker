@@ -9,7 +9,6 @@ import './settings.scss'
 
 const Settings = () => {
     const [accounts, setAccounts,] = useState([]);
-
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleOpenModal = () => {
@@ -21,6 +20,7 @@ const Settings = () => {
     };
 
     const getAccounts = async () => {
+        // console.log(accounts);
         try {
             const token = localStorage.getItem('token');
             const headers = {
@@ -42,7 +42,7 @@ const Settings = () => {
 
         <div className='settings'>
             <div className="top">
-                Settings
+               <h2>Settings</h2> 
 
                 <div>
                     <Button variant="contained" color="primary" onClick={handleOpenModal} style={{ margin: '20px 0' }}>
@@ -59,7 +59,7 @@ const Settings = () => {
 
             <div className="accounts">
                 {accounts.map(accs => (
-                    <Account account={accs} key={accs._id} />
+                    <Account account={accs} updateAccount={getAccounts} key={accs._id} />
                 ))}
             </div>
 

@@ -44,21 +44,64 @@ const getAllAccounts = async (req, res) => {
   }
 };
 
-const getAccount = async (req, res) => {
-
-  // todo
-};
 
 const updateAccount = async (req, res) => {
+  const { accountId } = req.params;
+  const userId = req.user._id;
 
-  // todo
+  try {
+    const account = await AccountModel.findById(accountId);
+
+    if (!account) {
+      res.status(404).json({ message: 'account not found' });
+      return;
+    }
+
+    // check for authentication
+    if (account.userId.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to update this account.' });
+      return;
+    }
+    // update Account
+    const updatedAccount = await AccountModel.findByIdAndUpdate(
+      accountId,
+      req.body,
+      { new: true },
+    );
+
+    res.status(200).json(updatedAccount);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
+// todo
 const removeAccount = async (req, res) => {
+  const { accountId } = req.params;
+  const userId = req.user._id;
 
-  // todo
+  try {
+    const account = await AccountModel.findById(accountId);
+
+    if (!account) {
+      res.status(404).json({ message: 'Account not found' });
+      return;
+    }
+
+    // check for authentication
+    if (account.userId.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to remove this account.' });
+      return;
+    }
+    // Model.prototype.deleteOne()
+    await account.deleteOne();
+
+    res.status(200).json(account);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export {
-  createAccount, getAllAccounts, getAccount, updateAccount, removeAccount,
+  createAccount, getAllAccounts, updateAccount, removeAccount,
 };

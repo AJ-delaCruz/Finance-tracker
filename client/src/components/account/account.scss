@@ -12,7 +12,9 @@
             justify-content: space-between;
             padding: 10px 77px 10px 77px;
             margin-bottom: 60px;
-
+            font-size: 18px;
+            font-weight: bold;
+            
             .button {
                 cursor: pointer;
             }
@@ -30,6 +32,22 @@
             display: flex;
             justify-content: space-between;
             padding: 10px 77px 10px 77px;
+
+            .accountType {
+                font-size: 16px;
+                font-weight: bold;
+            }
+            
+            .negative {
+                color: #ff5252;
+                font-weight: bold;
+            }
+            .positive {
+                color: #4caf50;
+                font-weight: bold;
+            }
+            
+            
         }
     }
 
