@@ -30,20 +30,11 @@ const Dashboard = () => {
     },
   ];
 
-  useEffect(() => {
-    fetchTransactions();
-
-
-    getBudgets();
-    getGoals();
-    fetchAccounts();
-  }, []);
-
 
   const fetchAccounts = async () => {
 
     try {
-      setLoading(true);
+      // setLoading(true);
 
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -58,20 +49,22 @@ const Dashboard = () => {
     } catch (error) {
       console.error(error);
     }
-    finally {
-      setLoading(false);
-    }
+    // finally {
+    //   setLoading(false);
+    // }
   };
 
 
   const fetchTransactions = async () => {
     try {
+      setLoading(true);
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
       //retrieve transactions data
       const [transactionsResponse] = await Promise.all([
-        axios.get(`${backendUrl}/transaction/all`, { headers }),
+        axios.get(`${backendUrl}/transaction/all?limit=6`, { headers }),
       ]);
 
 
@@ -79,6 +72,9 @@ const Dashboard = () => {
       // console.log(transactionsResponse.data);
     } catch (error) {
       console.error(error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -117,6 +113,17 @@ const Dashboard = () => {
       console.error('Error fetching goals:', error);
     }
   };
+
+
+  useEffect(() => {
+    fetchTransactions();
+
+
+    getBudgets();
+    getGoals();
+    fetchAccounts();
+  }, []);
+
   return (
     <>
       {/* <NextSeo
@@ -146,41 +153,57 @@ const Dashboard = () => {
               </BarChart>
             </div>
 
-
             <div className='account-summary'>
-              {/* Display the list of accounts with their respective balances */}
               <h3 className='tile-heading'>Account Summary</h3>
+              <table className='account-summary-table'>
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody >
+                  {accounts.map((account) => (
+                    <tr className='account-tile' key={account._id}>
+                      <td>{t(account.name)}</td>
+                      <td>$ {account.balance}</td>
 
 
-              {accounts.map((account) => (
-                <div className='account-tile' key={account._id}>
-                  {t(account.name)} - $ {account.balance}
-                </div>
-              ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-
 
             <div className='transactions'>
-              {/* Display recent transactions */}
               <h3 className='tile-heading'>Recent Transactions</h3>
-
-
-              {transactions.slice(-5).reverse().map((transaction) => {
-                const date = new Date(transaction.createdAt);
-                const month = date.toLocaleString('default', { month: 'long' });
-                const day = date.getDate();
-                const year = date.getFullYear();
-                const formattedDate = `${month} ${day}, ${year}`;
-
-
-                return (
-                  <div className='account-tile' key={transaction._id}>
-                    {t(formattedDate)}: {t(transaction.description)} -{' '}
-                    ${transaction.amount}
-                  </div>
-                );
-              })}
+              <table className='account-summary-table'>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody >
+                  {transactions.map((transaction) => {
+                    const date = new Date(transaction.createdAt);
+                    const month = date.toLocaleString('default', { month: 'long' });
+                    const day = date.getDate();
+                    const year = date.getFullYear();
+                    const formattedDate = `${month} ${day}, ${year}`;
+                    return (
+                      <tr className='account-tile' key={transaction._id}>
+                        <td>{t(formattedDate)}</td>
+                        <td>{t(transaction.category.name)}</td>
+                        <td>$ {transaction.amount}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
+
 
 
             <div className='budget'>

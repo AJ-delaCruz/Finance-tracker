@@ -101,15 +101,23 @@ const addTransaction = async (req, res) => {
 const getAllTransactions = async (req, res) => {
   try {
     const userId = req.user._id;
-    const transactions = await TransactionModel.find({ userId })
+    let query = TransactionModel.find({ userId })
       .populate('account', 'name') // retrieve account name instead of id
       .populate('category', 'name'); // retrieve category name instead of id
 
+    // option to limit the results
+    if (req.query.limit) {
+      query = query.sort({ _id: -1 }).limit(parseInt(req.query.limit, 10));
+    }
+
+    // execute query
+    const transactions = await query.exec();
+
     // no transactions found
-    if (!transactions) {
+    if (transactions.length === 0) {
       // not found
       res.status(404).json({ message: 'no transactions found' });
-      console.log('no transactions found');
+      console.log('No transactions found');
       return;
     }
     // console.log(transactions);

@@ -4,9 +4,6 @@ import { GoogleCharts } from 'google-charts';
 import { backendUrl } from '../../config';
 import './transaction.scss'
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
@@ -17,13 +14,11 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
 import { useTranslation } from 'react-i18next';
-
 import AddTransactionModal from './AddTransactionModal';
+import { CircularProgress } from '@mui/material';
+import TablePaginationActions from './TablePaginationActions';
+
 import {
   Button,
   TableSortLabel,
@@ -31,70 +26,11 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import { MoreVert, Edit, Delete } from '@mui/icons-material';
 import EditTransactionModal from './EditTransactionModal';
-
-function TablePaginationActions(props) {
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
-  const handleFirstPageButtonClick = (event) => {
-    onPageChange(event, 0);
-  };
-
-  const handleBackButtonClick = (event) => {
-    onPageChange(event, page - 1);
-  };
-
-  const handleNextButtonClick = (event) => {
-    onPageChange(event, page + 1);
-  };
-
-  const handleLastPageButtonClick = (event) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
-
-  return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page"
-      >
-        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page"
-      >
-        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
-        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
-        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>
-  );
-}
-
-TablePaginationActions.propTypes = {
-  count: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-};
-
 
 const Transaction = () => {
   const [transactions, setTransactions] = useState([]);
@@ -102,10 +38,10 @@ const Transaction = () => {
   const [allTransactions, setAllTransactions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const { t } = useTranslation();
-
   //sort
   const [orderBy, setOrderBy] = useState('createdAt');
   const [order, setOrder] = useState('desc');
+  const [loading, setLoading] = useState(true);
 
 
 
@@ -151,6 +87,8 @@ const Transaction = () => {
   //retrieve transactions by type (income or expense)
   const getTransactions = async () => {
     try {
+      // setLoading(true);
+      
       const token = localStorage.getItem('token');
       const headers = {
         Authorization: `Bearer ${token}`
@@ -160,30 +98,47 @@ const Transaction = () => {
       setTransactions(response.data);
       // console.log(response);
     } catch (error) {
+      // if (axios.isCancel(error)) {
+      //   console.log("getTransactions request cancelled");
+      // } else {
       console.error(error);
+      // }
     }
+        // finally {
+    //   setLoading(false);
+    // }
   };
 
 
   //retrieve all transactions regardless of type
-  const fetchAllTransactions = async () => {
+  const fetchAllTransactions = async (cancelToken, isMounted) => {
     try {
+      // setLoading(true);
+
       const token = localStorage.getItem('token');
       const headers = {
         Authorization: `Bearer ${token}`
       };
       //retrieve transactions data
-      const [transactionsResponse] = await Promise.all([
-        axios.get(`${backendUrl}/transaction/all`, { headers }),
-
-      ]);
+      const transactionsResponse = await axios.get(`${backendUrl}/transaction/all`, { headers });
 
 
-      setAllTransactions(transactionsResponse.data);
+      // setAllTransactions(transactionsResponse.data);
+      // Only update state if the component is still mounted
+      if (isMounted.current) {
+        setAllTransactions(transactionsResponse.data);
+      }
       // console.log(transactionsResponse.data);
     } catch (error) {
-      console.error(error);
+      if (axios.isCancel(error)) {
+        console.log("fetchAllTransactions request cancelled");
+      } else {
+        console.error(error);
+      }
     }
+    // finally {
+    //   setLoading(false);
+    // }
   };
 
 
@@ -208,11 +163,30 @@ const Transaction = () => {
   };
 
   useEffect(() => {
+    // const cancelTokenSource = axios.CancelToken.source();
+
+    // getTransactions(cancelTokenSource.token);
+    // return () => {
+    //   // cancel the API request when the component unmounts
+    //   cancelTokenSource.cancel();
+    // };
     getTransactions();
-  }, []);
+
+  }, [type]);
 
   useEffect(() => {
-    fetchAllTransactions();
+    const isMounted = { current: true };
+    const cancelTokenSource = axios.CancelToken.source();
+
+    fetchAllTransactions(cancelTokenSource.token, isMounted);
+
+    return () => {
+      // cancel the API request when the component unmounts
+      isMounted.current = false;
+      cancelTokenSource.cancel();
+
+    };
+    // fetchAllTransactions();
   }, [transactions]);
 
 
@@ -310,206 +284,213 @@ const Transaction = () => {
 
 
   return (
-    <div className='transaction'>
-      <div className='top'>
-        <h2> {t('Transactions')}</h2>
-        <div>
-          <Button variant="contained" color="primary" onClick={handleOpenModal} style={{ margin: '20px 0' }}>
-            {t('Add Transaction')}
-          </Button>
-          <AddTransactionModal open={modalOpen} handleClose={handleCloseModal} handleAddedTransaction={getTransactions} />
+      <div className='transaction'>
+            {/* {loading ? (
+          <CircularProgress />
+        ) : (
+          <> */}
+        <div className='top'>
+          <h2> {t('Transactions')}</h2>
+          <div>
+            <Button variant="contained" color="primary" onClick={handleOpenModal} style={{ margin: '20px 0' }}>
+              {t('Add Transaction')}
+            </Button>
+            <AddTransactionModal open={modalOpen} handleClose={handleCloseModal} handleAddedTransaction={getTransactions} />
+          </div>
         </div>
-      </div>
 
-      <div className='bottom'>
+        <div className='bottom'>
 
-        <div id="piechart" style={{ width: '100%', height: '500px' }}></div>
 
-        {/* <select className='select' value={type} onChange={(e) => setType(e.target.value)}>
+          {/* <select className='select' value={type} onChange={(e) => setType(e.target.value)}>
                     <option value="expense">Expenses</option>
                     <option value="income">Income</option>
                 </select> */}
-      </div>
+          <div className="type-toggle">
+            <ToggleButtonGroup
+              value={type}
+              exclusive
+              onChange={(e) => setType(e.target.value)}
+              aria-label="Pie chart type"
+            >
+              <ToggleButton value="expense" aria-label="Expenses">
+                Expenses
+              </ToggleButton>
+              <ToggleButton value="income" aria-label="Income">
+                Income
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </div>
+          <div id="piechart" style={{ width: '100%', height: '500px' }}></div>
+        </div>
+        {/* {loading ? (
+          <CircularProgress />
+        ) : ( */}
+          <div className='bottom'>
 
-      <div className='bottom'>
+            {/* <div id="piechart2" style={{ width: '90%', height: '500px' }}></div> */}
+            <TableContainer component={Paper} >
+              <Table>
+                <TableHead>
+                  <TableRow className='table-header'>
 
-        {/* <div id="piechart2" style={{ width: '90%', height: '500px' }}></div> */}
-        <TableContainer component={Paper} >
-          <Table>
-            <TableHead>
-              <TableRow className='table-header'>
-
-                <TableCell className='center-align tab-header'>
-                  <TableSortLabel
-                    active={orderBy === 'createdAt'}
-                    direction={orderBy === 'createdAt' ? order : 'asc'}
-                    onClick={() => handleSortChange('createdAt')}
-                  >
-                    Date
-                  </TableSortLabel>
-                </TableCell>
-
-
-                {/* <TableCell className='center-align tab-header'>Description</TableCell> */}
-
-                <TableCell className='center-align tab-header'>
-                  <TableSortLabel
-                    active={orderBy === 'description'}
-                    direction={orderBy === 'description' ? order : 'asc'}
-                    onClick={() => handleSortChange('description')}
-                  >
-                    Description
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell className='center-align tab-header'>
-                  <TableSortLabel
-                    active={orderBy === 'type'}
-                    direction={orderBy === 'type' ? order : 'asc'}
-                    onClick={() => handleSortChange('type')}
-                  >
-                    Type
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell className='center-align tab-header'>
-                  <TableSortLabel
-                    active={orderBy === 'category'}
-                    direction={orderBy === 'category' ? order : 'asc'}
-                    onClick={() => handleSortChange('category')}
-                  >
-                    Category
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell className='center-align tab-header'>
-                  <TableSortLabel
-                    active={orderBy === 'amount'}
-                    direction={orderBy === 'amount' ? order : 'asc'}
-                    onClick={() => handleSortChange('amount')}
-                  >
-                    Amount
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell className='center-align tab-header'>
-                  <TableSortLabel
-                    active={orderBy === 'account'}
-                    direction={orderBy === 'account' ? order : 'asc'}
-                    onClick={() => handleSortChange('account')}
-                  >
-                    Account
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell className='center-align tab-header'> </TableCell>
-
-              </TableRow>
-
-
-            </TableHead>
-            {/* <TableBody>
-              {stableSort(
-                rowsPerPage > 0
-                  ? allTransactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  : allTransactions,
-                getComparator(order, orderBy)
-              ).map((row) => (
-                <TableRow key={row._id} className='table-row'>
-                  <TableCell className='center-align'>{t(row.description)}</TableCell>
-                  <TableCell className='center-align'>{t(row.type)}</TableCell>
-                  <TableCell className='center-align'>{t(row.category.name)}</TableCell>
-                  <TableCell className='center-align'>{row.amount}</TableCell>
-                  <TableCell className='center-align'>{t(row.account.name)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody> */}
-
-            {/* sort entire data set, not just the current rows displayed on table */}
-            <TableBody>
-              {stableSort(
-                rowsPerPage > 0 ? allTransactions : allTransactions.slice(0),
-                getComparator(order, orderBy)
-              )
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((transaction) => (
-                  <TableRow key={transaction._id}>
-                    {/* <TableCell className='center-align'>{(transaction.createdAt).slice(0, 10)} </TableCell> */}
-                    <TableCell className='center-align'>{new Date(transaction.createdAt).toLocaleDateString()}</TableCell>
-
-                    <TableCell className='center-align'>{t(transaction.description)}</TableCell>
-                    <TableCell className='center-align'>{t(transaction.type)}</TableCell>
-                    <TableCell className='center-align'>{t(transaction.category.name)}</TableCell>
-                    <TableCell className='center-align'>${transaction.amount}</TableCell>
-                    <TableCell className='center-align'>{t(transaction.account.name)}</TableCell>
-
-
-                    {/* edit/remove */}
-                    <TableCell>
-                      <IconButton onClick={(e) => handleOpenMenu(e, transaction)}>
-                        <MoreVert />
-                      </IconButton>
-                      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-
-                        {/* edit   */}
-                        <MenuItem
-                        onClick={() => handleEditModalOpen(transaction)}
-                        >
-                          <ListItemIcon>
-                            <Edit fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText primary="Edit" />
-                        </MenuItem>
-
-                        {/* delete */}
-                        <MenuItem
-                          onClick={() => handleDelete(selectedTransaction._id)}
-                        >
-                          <ListItemIcon>
-                            <Delete fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText primary="Delete" />
-                        </MenuItem>
-                      </Menu>
+                    <TableCell className='center-align tab-header'>
+                      <TableSortLabel
+                        active={orderBy === 'createdAt'}
+                        direction={orderBy === 'createdAt' ? order : 'asc'}
+                        onClick={() => handleSortChange('createdAt')}
+                      >
+                        Date
+                      </TableSortLabel>
                     </TableCell>
+
+
+                    {/* <TableCell className='center-align tab-header'>Description</TableCell> */}
+
+                    <TableCell className='center-align tab-header'>
+                      <TableSortLabel
+                        active={orderBy === 'description'}
+                        direction={orderBy === 'description' ? order : 'asc'}
+                        onClick={() => handleSortChange('description')}
+                      >
+                        Description
+                      </TableSortLabel>
+                    </TableCell>
+
+                    <TableCell className='center-align tab-header'>
+                      <TableSortLabel
+                        active={orderBy === 'type'}
+                        direction={orderBy === 'type' ? order : 'asc'}
+                        onClick={() => handleSortChange('type')}
+                      >
+                        Type
+                      </TableSortLabel>
+                    </TableCell>
+
+                    <TableCell className='center-align tab-header'>
+                      <TableSortLabel
+                        active={orderBy === 'category'}
+                        direction={orderBy === 'category' ? order : 'asc'}
+                        onClick={() => handleSortChange('category')}
+                      >
+                        Category
+                      </TableSortLabel>
+                    </TableCell>
+
+                    <TableCell className='center-align tab-header'>
+                      <TableSortLabel
+                        active={orderBy === 'amount'}
+                        direction={orderBy === 'amount' ? order : 'asc'}
+                        onClick={() => handleSortChange('amount')}
+                      >
+                        Amount
+                      </TableSortLabel>
+                    </TableCell>
+
+                    <TableCell className='center-align tab-header'>
+                      <TableSortLabel
+                        active={orderBy === 'account'}
+                        direction={orderBy === 'account' ? order : 'asc'}
+                        onClick={() => handleSortChange('account')}
+                      >
+                        Account
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell className='center-align tab-header'> </TableCell>
+
                   </TableRow>
 
-                ))}
 
-              {editModalOpen && (<EditTransactionModal
-                open={editModalOpen}
-                handleClose={handleEditModalClose}
-                transaction={selectedTransaction}
-                updateEditedTransaction={getTransactions}
+                </TableHead>
 
-                // transactionToEdit={selectedTransaction}
-                // handleEditedTransaction={getTransactions}
-              />)}
+                {/* sort entire data set, not just the current rows displayed on table */}
+                <TableBody>
+                  {stableSort(
+                    rowsPerPage > 0 ? allTransactions : allTransactions.slice(0),
+                    getComparator(order, orderBy)
+                  )
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((transaction) => (
+                      <TableRow key={transaction._id}>
+                        {/* <TableCell className='center-align'>{(transaction.createdAt).slice(0, 10)} </TableCell> */}
+                        <TableCell className='center-align'>{new Date(transaction.createdAt).toLocaleDateString()}</TableCell>
 
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                  colSpan={3}
-                  count={allTransactions.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    inputProps: {
-                      'aria-label': 'rows per page',
-                    },
-                    native: true,
-                  }}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActions}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
+                        <TableCell className='center-align'>{t(transaction.description)}</TableCell>
+                        <TableCell className='center-align'>{t(transaction.type)}</TableCell>
+                        <TableCell className='center-align'>{t(transaction.category.name)}</TableCell>
+                        <TableCell className='center-align'>${transaction.amount}</TableCell>
+                        <TableCell className='center-align'>{t(transaction.account.name)}</TableCell>
+
+
+                        {/* edit/remove */}
+                        <TableCell>
+                          <IconButton onClick={(e) => handleOpenMenu(e, transaction)}>
+                            <MoreVert />
+                          </IconButton>
+                          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+
+                            {/* edit   */}
+                            <MenuItem
+                              onClick={() => handleEditModalOpen(transaction)}
+                            >
+                              <ListItemIcon>
+                                <Edit fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText primary="Edit" />
+                            </MenuItem>
+
+                            {/* delete */}
+                            <MenuItem
+                              onClick={() => handleDelete(selectedTransaction._id)}
+                            >
+                              <ListItemIcon>
+                                <Delete fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText primary="Delete" />
+                            </MenuItem>
+                          </Menu>
+                        </TableCell>
+                      </TableRow>
+
+                    ))}
+
+                  {editModalOpen && (<EditTransactionModal
+                    open={editModalOpen}
+                    handleClose={handleEditModalClose}
+                    transaction={selectedTransaction}
+                    updateEditedTransaction={getTransactions}
+
+                  // transactionToEdit={selectedTransaction}
+                  // handleEditedTransaction={getTransactions}
+                  />)}
+
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                      colSpan={7}
+                      count={allTransactions.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      SelectProps={{
+                        inputProps: {
+                          'aria-label': 'rows per page',
+                        },
+                        native: true,
+                      }}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      ActionsComponent={TablePaginationActions}
+                    />
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </TableContainer>
+          </div>
+      
       </div>
-    </div>
+     
   );
 };
 
