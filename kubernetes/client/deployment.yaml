@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react-client
+  template:
+    metadata:
+      labels:
+        app: react-client
+    spec:
+      containers:
+      - name: react-client
+        image: aj09/finance-client #dockerhub
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 4000
+        # env:   #env variable
+        # - name: REACT_APP_BACKEND_URL
+        #   valueFrom: 
+        #     secretKeyRef: 
+        #       name: secret # secret metadata name
+        #       key:  REACT_APP_BACKEND_URL
+  
+
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-service
+spec:
+  type: NodePort
+  selector:
+    app: react-client
+  ports:
+  - port: 4000
+    targetPort: 4000
+    # nodePort: 30007
