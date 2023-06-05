@@ -17,10 +17,17 @@ spec:
         image: aj09/finance-client #dockerhub
         resources:
           limits:
-            memory: "128Mi"
+            # memory: "512Mi"
+            memory: "2Gi"
             cpu: "500m"
         ports:
         - containerPort: 4000
+        env:
+        - name: REACT_APP_BACKEND_URL
+          valueFrom: 
+            configMapKeyRef: 
+              name: config # configMap file
+              key: backendUrl
         # env:   #env variable
         # - name: REACT_APP_BACKEND_URL
         #   valueFrom: 
@@ -36,10 +43,10 @@ kind: Service
 metadata:
   name: react-service
 spec:
-  type: NodePort
+  # type: NodePort
   selector:
     app: react-client
   ports:
-  - port: 4000
+  - port: 80
     targetPort: 4000
     # nodePort: 30007
