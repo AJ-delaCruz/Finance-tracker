@@ -10,20 +10,20 @@ pipeline {
                 }
             }
         }
-        // stage('Test') {
-        //     steps {
-        //         script {
-        //             echo 'Testing...'
-        //             sh 'docker-compose -f docker-compose.yml up --exit-code-from test'
-        //         }
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                script {
+                    echo 'Testing...'
+                    // sh 'docker-compose -f docker-compose.yml up --exit-code-from test'
+                }
+            }
+        }
         stage('Push images') {
             steps {
                 script {
                     echo 'Pushing docker images...'
                     sh 'docker push aj09/finance-client'
-                    sh 'docker push aj09/finance-client'
+                    sh 'docker push aj09/finance-node'
                 }
             }
         }

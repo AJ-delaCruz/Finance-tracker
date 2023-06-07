@@ -4,7 +4,7 @@ services:
   backend:
     build: #builds the docker image locally
       context: ./server
-      dockerfile: Dockerfile #default
+      dockerfile: Dockerfile.prod 
     image: aj09/finance-node #dockerhub
 #    platform: linux/arm64
 #    env_file:
@@ -18,7 +18,7 @@ services:
   frontend:
     build: #builds the docker image locally
       context: ./client
-      dockerfile: Dockerfile #default
+      dockerfile: Dockerfile.prod
     image: aj09/finance-client #dockerhub
 #    env_file:
 #      - ./client/.env #load external env file
