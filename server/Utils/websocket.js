@@ -1,12 +1,14 @@
 import { Server } from 'socket.io';
 
 let io;
-//create Socket.IO singleton
+// create Socket.IO singleton
 export const initializeIo = (httpServer) => {
   // Handle WebSocket connections
   io = new Server(httpServer, {
+    path: '/sockets',
     cors: {
-      origin: [process.env.frontendURL, 'http://localhost:4000'],
+      // origin: [process.env.frontendURL, 'http://localhost:4000'],
+      origin: '*',
     },
   });
 
@@ -23,7 +25,7 @@ export const initializeIo = (httpServer) => {
   });
 };
 
-//Call Socket.io after initialized
+// Call Socket.io after initialized
 export const socketIO = () => {
   if (!io) {
     throw new Error('Socket.io not initialized');

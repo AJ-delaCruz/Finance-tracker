@@ -14,8 +14,11 @@ export const NotificationProvider = ({ children }) => {
 
     //real time notifications
     useEffect(() => {
-        const socket = io(`${backendUrl}`);
+        // console.log(`${window.location.origin}`);
+        // const socket = io(`${window.location.protocol}//${window.location.hostname}/ws`);
 
+        const socket = io({path: '/sockets'}); //nginx routes to socket.io path "/sockets" of backend server
+        
         socket.on('notificationEvent', (event) => {
             // Increment the notification count
             setNotificationCount((prevCount) => prevCount + 1);

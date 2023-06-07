@@ -15,7 +15,6 @@ import chatbotRoute from './routes/chatbot.js';
 import { initializeIo } from './Utils/websocket.js';
 
 dotenv.config();
-
 const app = express(); // create an express app
 
 // create a Socket.IO server for websocket and attach to http server
@@ -24,7 +23,8 @@ initializeIo(http); // Initialize Socket.IO with the HTTP server
 
 app.use(cors({
   // handle http API request
-  origin: [process.env.frontendURL, 'http://localhost:4000'],
+  // origin: [process.env.frontendURL, 'http://localhost:4000'],
+  origin: '*',
   // credentials: true
 }));
 
@@ -51,18 +51,16 @@ mongoose.connect(process.env.MONGODB_URL, options)
     console.log('MongoDB Connection Failed');
   });
 
-app.use('/user', userRoute);
-app.use('/account', accountRoute);
-app.use('/transaction', transactionRoute);
-app.use('/category', categoryRoute);
-app.use('/budget', budgetRoute);
-app.use('/goal', goalRoute);
-app.use('/bill', billRoute);
-app.use('/chat', chatbotRoute);
-
+app.use('/api/user', userRoute);
+app.use('/api/account', accountRoute);
+app.use('/api/transaction', transactionRoute);
+app.use('/api/category', categoryRoute);
+app.use('/api/budget', budgetRoute);
+app.use('/api/goal', goalRoute);
+app.use('/api/bill', billRoute);
+app.use('/api/chat', chatbotRoute);
 
 // start the HTTP server for both Express app and Socket.IO server
 http.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
-
