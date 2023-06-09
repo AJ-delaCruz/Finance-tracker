@@ -1,6 +1,11 @@
-import AccountModel from '../models/AccountModel.js';
+import {
+  createAccountService,
+  getAllAccountsService,
+  updateAccountService,
+  removeAccountService,
+} from '../services/accountService.js';
 
-// create a checking or savings account
+// create a checking, savings, credit card, or loan account
 const createAccount = async (req, res) => {
   const {
     type, name, balance, creditLimit,
@@ -8,12 +13,7 @@ const createAccount = async (req, res) => {
   const userId = req.user._id;
   try {
     // create new account
-    const newAccount = new AccountModel({
-      userId, type, name, balance, creditLimit,
-    });
-    // store account in db
-    await newAccount.save();
-    // console.log(newAccount);
+    const newAccount = await createAccountService(userId, type, name, balance, creditLimit);
 
     // return response to client
     res.status(201).json(newAccount);
@@ -26,79 +26,64 @@ const createAccount = async (req, res) => {
 const getAllAccounts = async (req, res) => {
   try {
     const userId = req.user._id;
-    const accounts = await AccountModel.find({ userId });
-
-    // no accounts found
-    if (!accounts) {
-      // not found
-      res.status(404).json({ message: 'no accounts found' });
-      console.log('no accounts found');
-      return;
-    }
-    // console.log(accounts);
+    const accounts = await getAllAccountsService(userId);
 
     res.status(200).json(accounts);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+    switch (error.name) {
+      case 'NotFoundError':
+        res.status(404).json({ message: error.message });
+        break;
+      default:
+        res.status(500).json({ message: error.message });
+    }
   }
 };
-
 
 const updateAccount = async (req, res) => {
   const { accountId } = req.params;
   const userId = req.user._id;
+  const { updateData } = req.body;
 
   try {
-    const account = await AccountModel.findById(accountId);
-
-    if (!account) {
-      res.status(404).json({ message: 'account not found' });
-      return;
-    }
-
-    // check for authentication
-    if (account.userId.toString() !== userId.toString()) {
-      res.status(403).json({ message: 'You do not have permission to update this account.' });
-      return;
-    }
-    // update Account
-    const updatedAccount = await AccountModel.findByIdAndUpdate(
-      accountId,
-      req.body,
-      { new: true },
-    );
+    const updatedAccount = await updateAccountService(accountId, userId, updateData);
 
     res.status(200).json(updatedAccount);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    switch (error.name) {
+      case 'UnauthorizedError':
+        res.status(403).json({ message: error.message });
+        break;
+      case 'NotFoundError':
+        res.status(404).json({ message: error.message });
+        break;
+      default:
+        res.status(500).json({ message: error.message });
+    }
   }
 };
 
-// todo
+// todo in react
 const removeAccount = async (req, res) => {
   const { accountId } = req.params;
   const userId = req.user._id;
 
   try {
-    const account = await AccountModel.findById(accountId);
-
-    if (!account) {
-      res.status(404).json({ message: 'Account not found' });
-      return;
-    }
-
-    // check for authentication
-    if (account.userId.toString() !== userId.toString()) {
-      res.status(403).json({ message: 'You do not have permission to remove this account.' });
-      return;
-    }
-    // Model.prototype.deleteOne()
-    await account.deleteOne();
+    const account = await removeAccountService(accountId, userId);
 
     res.status(200).json(account);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    switch (error.name) {
+      case 'UnauthorizedError':
+        res.status(403).json({ message: error.message });
+        break;
+      case 'NotFoundError':
+        res.status(404).json({ message: error.message });
+        break;
+      default:
+        res.status(500).json({ message: error.message });
+    }
   }
 };
 
