@@ -44,7 +44,7 @@ const getAllAccounts = async (req, res) => {
 const updateAccount = async (req, res) => {
   const { accountId } = req.params;
   const userId = req.user._id;
-  const { updateData } = req.body;
+  const updateData = req.body;
 
   try {
     const updatedAccount = await updateAccountService(accountId, userId, updateData);
