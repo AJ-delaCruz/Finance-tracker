@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 // goal model to track financial goals
 const goalSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
   name: { type: String, required: true },
   description: { type: String },
   currentAmount: { type: Number, required: true },
