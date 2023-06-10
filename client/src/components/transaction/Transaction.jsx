@@ -94,7 +94,7 @@ const Transaction = () => {
         Authorization: `Bearer ${token}`
       };
 
-      const response = await axios.get(`${backendUrl}/transaction/byCategory?type=${type}`, { headers });
+      const response = await axios.get(`${backendUrl}/transaction/byType?type=${type}`, { headers });
       setTransactions(response.data);
       // console.log(response);
     } catch (error) {

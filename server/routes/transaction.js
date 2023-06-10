@@ -7,7 +7,7 @@ import { checkAuth } from '../Utils/passport.js'; // to get userId
 
 const router = express.Router();
 router.post('/create', checkAuth, addTransaction);
-router.get('/byCategory', checkAuth, getTransactionByType);
+router.get('/byType', checkAuth, getTransactionByType);
 router.get('/all', checkAuth, getAllTransactions);
 router.delete('/:transactionId', checkAuth, removeTransaction);
 router.put('/update/:transactionId', checkAuth, updateTransaction);

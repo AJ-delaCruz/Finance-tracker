@@ -1,0 +1,107 @@
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import app from '../../index.js';
+import TransactionModel from '../../models/TransactionModel.js';
+
+const { expect } = chai;
+chai.use(chaiHttp);
+// Transaction API tests
+describe('Transaction API', () => {
+  let token;
+  let transactionTest;
+
+  // get user token authentication
+  before((done) => {
+    chai.request(app)
+      .post('/api/user/login')
+      .send({ username: 'new', password: 'test' }) // get user credentials
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        token = res.body.token; // Get the token from the response
+        return done();
+      });
+  });
+  // Delete the created transaction after tests finished
+  after((done) => {
+    if (transactionTest) {
+      TransactionModel.findByIdAndDelete(transactionTest._id)
+        .then(() => done())
+        .catch((err) => done(err));
+    } else {
+      done();
+    }
+  });
+
+  // test transaction POST request
+  describe('POST transaction', () => {
+    it('should create a new transaction', (done) => {
+      const transaction = {
+        account: '646148949c3a54da85982a0d',
+        category: '64607c0606fccc9dc370addb',
+        type: 'expense',
+        amount: 50,
+        description: 'Coffee',
+      };
+
+      chai.request(app)
+        .post('/api/transaction/create')
+        .set('Authorization', `Bearer ${token}`) // Set jwt
+        .send(transaction)
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          transactionTest = res.body; // delete after all tests finished
+          expect(res.status).to.equal(201);
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.have.property('_id');
+          expect(res.body).to.have.property('account');
+          expect(res.body).to.have.property('category');
+          expect(res.body).to.have.property('type');
+          expect(res.body).to.have.property('amount');
+
+          return done();
+        });
+    });
+  });
+
+  // test transaction GET request
+  describe('GET all transactions', () => {
+    it('should return all transactions', (done) => {
+      chai.request(app)
+        .get('/api/transaction/all')
+        .set('Authorization', `Bearer ${token}`) // set jwt
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          expect(res.status).to.equal(200);
+          expect(res.body).to.be.an('array');
+          return done();
+        });
+    });
+  });
+
+  // TODO
+  describe('GET all transactions by type', () => {
+    it('should return all transactions by type', (done) => {
+      // todo
+      done();
+    });
+  });
+  describe('PUT transaction', () => {
+    it('should update the transaction', (done) => {
+      // todo
+      done();
+    });
+  });
+
+  describe('DELETE transaction', () => {
+    it('should delete the transaction', (done) => {
+      // todo
+      done();
+    });
+  });
+});
