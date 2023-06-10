@@ -64,3 +64,5 @@ app.use('/api/chat', chatbotRoute);
 http.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+export default app; // for testing
