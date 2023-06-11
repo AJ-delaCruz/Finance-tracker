@@ -1,6 +1,6 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const login = require('./login');
-const baseURL = 'http://localhost:4000';
+const baseURL = process.env.node === 'test' ? '' : 'http://localhost:4000';
 
 describe('Bill Test', () => {
     let driver;
@@ -65,7 +65,8 @@ describe('Bill Test', () => {
         await driver.wait(until.stalenessOf(await driver.findElement(By.css('.MuiDialog-root'))), 1000); // Wait for the modal to close
 
         const billRows = await driver.findElements(By.css('.bills .bottom .table-row')); // Find all the bill rows
-        const newBillExists = billRows.some(async (row) => {
+        let newBillExists = false;
+        for (let row of billRows) {
             // Check if the new bill exists in the bill rows
             const nameCell = await row.findElement(By.css('.center-align:first-child')); // Find the name cell
             const amountCell = await row.findElement(By.css('.center-align:nth-child(2)')); // Find the amount cell
@@ -75,8 +76,11 @@ describe('Bill Test', () => {
             const amount = await amountCell.getText(); // Get the text of the amount cell
             const dueDate = await dueDateCell.getText(); // Get the text of the due date cell
 
-            return name === 'Test Bill' && amount === '$100' && dueDate === '6/15/2023'; // Check if the values match the new bill
-        });
+            if (name === 'Test Bill' && amount === '$100' && dueDate === '6/15/2023') { // Check if the values match the new bill
+                newBillExists = true;
+                break;  // Exit the loop as soon as you found the match
+            }
+        }
 
         expect(newBillExists).toBe(true); // Assert that the new bill exists in the bill rows
 

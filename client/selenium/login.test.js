@@ -1,6 +1,6 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 
-const baseURL = 'http://localhost:4000';
+const baseURL = process.env.node === 'test' ? '' : 'http://localhost:4000';
 
 describe('Login Test', () => {
     let driver;

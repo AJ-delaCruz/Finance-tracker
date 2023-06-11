@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import { backendUrl } from '../config';
+import { wsUrl } from '../config';
 
 //create new context object for Notification
 export const NotificationContext = createContext();
@@ -11,14 +11,22 @@ export const NotificationProvider = ({ children }) => {
     const [notificationCount, setNotificationCount] = useState(0);
     const [notificationEvents, setNotificationEvents] = useState([]);
 
+    // let socketPath = ''; //for localhost
+    let socketPath = '/sockets';
+    // if (process.env.NODE_ENV === 'production') {
+    //     socketPath = '/sockets';
+    // }
 
     //real time notifications
     useEffect(() => {
-        // console.log(`${window.location.origin}`);
-        // const socket = io(`${window.location.protocol}//${window.location.hostname}/ws`);
+        //    console.log(process.env.NODE_ENV);
 
-        const socket = io({path: '/sockets'}); //nginx routes to socket.io path "/sockets" of backend server
-        
+        //nginx routes to socket.io path "/sockets" of backend server
+        const socket = io(
+            wsUrl,
+            { path: socketPath } //path appended to backend url endpoint
+        );
+
         socket.on('notificationEvent', (event) => {
             // Increment the notification count
             setNotificationCount((prevCount) => prevCount + 1);
