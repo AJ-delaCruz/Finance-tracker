@@ -120,13 +120,13 @@ const getTransactionByTypeService = async (userId, transactionType) => {
       $group: {
         _id: '$categoryData.name',
         totalAmount: { $sum: '$amount' },
+        type: { $first: '$type' },
       },
     },
     // sort by each category total amount in descending order
     { $sort: { totalAmount: -1 } },
   ]);
   // console.log(transactionsByCategory);
-
   return transactionsByCategory;
 };
 

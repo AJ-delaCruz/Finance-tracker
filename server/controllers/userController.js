@@ -101,8 +101,26 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user._id;
 
-  // todo
+  try {
+    const user = await UserModel.findByIdAndDelete(id);
+
+    if (!user) {
+      res.status(404).json({ message: 'No user found' });
+      return;
+    }
+
+    if (user._id.toString() !== userId.toString()) {
+      res.status(403).json({ message: 'You do not have permission to remove this user' });
+      return;
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 export {
