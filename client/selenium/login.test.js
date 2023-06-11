@@ -1,6 +1,6 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 
-const baseURL = 'http://localhost:4000'; 
+const baseURL = 'http://localhost:4000';
 
 describe('Login Test', () => {
     let driver;
@@ -17,7 +17,7 @@ describe('Login Test', () => {
 
     test('Login with valid credentials', async () => {
 
-         // Navigate to a login page
+        // Navigate to a login page
         await driver.get(`${baseURL}/login`);
 
         // Find username and password input fields and enter values, then press key
@@ -26,6 +26,9 @@ describe('Login Test', () => {
 
         //wait until url matches the home page "/" for 10 secs
         await driver.wait(until.urlIs(`${baseURL}/`), 10000);
+
+        // wait until h3 tag is visible for 10 secs due to loading variable in dashboard component
+        await driver.wait(until.elementLocated(By.tagName('h3')), 10000);
 
         //find <h> tag and gets the value
         const dashboardTitle = await driver.findElement(By.tagName('h3')).getText();
