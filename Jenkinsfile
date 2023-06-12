@@ -5,8 +5,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    echo 'Building docker images...'
-                    sh 'docker-compose -f docker-compose.yml build'
+                    echo 'Building Docker images for testing...'
+                    sh 'docker-compose -f docker-compose.test.yml build'
                 }
             }
         }
@@ -14,7 +14,15 @@ pipeline {
             steps {
                 script {
                     echo 'Testing...'
-                    // sh 'docker-compose -f docker-compose.yml up --exit-code-from test'
+                    sh 'docker-compose -f docker-compose.test.yml up --build --exit-code-from backend'
+                }
+            }
+        }
+        stage('Build production images') {
+            steps {
+                script {
+                    echo 'Building docker images for production ...'
+                    sh 'docker-compose -f docker-compose.yml build'
                 }
             }
         }
@@ -22,8 +30,13 @@ pipeline {
             steps {
                 script {
                     echo 'Pushing docker images...'
-                    sh 'docker push aj09/finance-client'
-                    sh 'docker push aj09/finance-node'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-id', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PW')]) {
+
+                        // sh 'docker login -u $DOCKER_USER -p $DOCKER_PW'
+                        sh 'echo $DOCKER_PW | docker login --username $DOCKER_USER --password-stdin'
+                        sh 'docker push aj09/finance-client'
+                        sh 'docker push aj09/finance-node'
+                    }
                 }
             }
         }
@@ -34,5 +47,10 @@ pipeline {
                 }
             }
         }
+    }
+    post {
+        always {  
+            sh 'docker logout'           
+        }   
     }
 }

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build: #builds the docker image locally
+      context: ./server
+      dockerfile: Dockerfile
+    # env_file:
+    #   - ./server/.env #load external env file
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=test
+    command: npm run test
+
+
+  frontend:
+    build: #builds the docker image locally
+      context: ./client
+      dockerfile: Dockerfile
+#    env_file:
+#      - ./client/.env #load external env file
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=test
+
