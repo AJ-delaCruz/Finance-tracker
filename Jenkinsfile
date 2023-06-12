@@ -1,6 +1,13 @@
 pipeline {
     agent any 
 
+    environment {
+        MONGODB_URL = "${MONGODB_URL}"
+        JWT_SECRET = "${JWT_SECRET}"
+        frontendURL = "${frontendURL}"
+        OPENAI_API_KEY = "${OPENAI_API_KEY}"
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -14,7 +21,7 @@ pipeline {
             steps {
                 script {
                     echo 'Testing...'
-                    sh 'docker-compose -f docker-compose.test.yml up --build --exit-code-from backend'
+                    sh 'docker-compose -f docker-compose.test.yml up --exit-code-from backend'
                 }
             }
         }
