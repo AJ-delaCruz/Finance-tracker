@@ -6,6 +6,7 @@ pipeline {
         JWT_SECRET = "${JWT_SECRET}"
         frontendURL = "${frontendURL}"
         OPENAI_API_KEY = "${OPENAI_API_KEY}"
+        REACT_APP_BACKEND_URL = "${REACT_APP_BACKEND_URL}"
     }
 
     stages {
