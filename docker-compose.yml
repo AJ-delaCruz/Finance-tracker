@@ -26,3 +26,4 @@ services:
       - '4000:4000'
     environment:
       - NODE_ENV=production
+      - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
