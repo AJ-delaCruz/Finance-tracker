@@ -38,7 +38,7 @@ pipeline {
                 script {
                     echo 'Pushing docker images...'
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-id', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PW')]) {
-
+                         echo "Username: ${DOCKER_USER}"
                         // sh 'docker login -u $DOCKER_USER -p $DOCKER_PW'
                         sh 'echo $DOCKER_PW | docker login --username $DOCKER_USER --password-stdin'
                         sh 'docker push aj09/finance-client'
