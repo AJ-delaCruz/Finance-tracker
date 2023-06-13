@@ -51,6 +51,7 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying...'
+                    sh 'kubectl apply -f kubernetes/ --recursive'
                 }
             }
         }
