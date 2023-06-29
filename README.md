@@ -2,6 +2,7 @@
 
 ## Table of Contents
 - [Project Description](#project-description)
+- [System Architecture](#system-architecture)
 - [How to Run Locally](#how-to-run-locally)
 - [Running Integration Tests](#running-integration-tests)
 - [Local Deployment with Kubernetes](#local-deployment-with-kubernetes)
@@ -12,6 +13,8 @@
 ## Project Description 
 The Finance tracker application offers features for managing personal finances. It allows users to track transactions, set budgets, define financial goals, and manage bills. The chatbot feature automates customer service by providing assistance to users with questions about the application such as how to set transactions, budgets, bills, or goals.
 
+## System Architecture
+![System Architecture](https://github.com/AJ-delaCruz/Finance-tracker/assets/54551895/32a19697-f8e9-4f29-9179-ba9bef1f387d)
 
 ## How to run locally
 1. Clone the repository:
@@ -55,7 +58,7 @@ docker-compose -f docker-compose.test.yml up --build
 minikube start
 minikube status
 ```
-2. Create the secrets.yaml configuration file in kubernetes directory
+2. Create the secrets.yaml configuration file in Kubernetes directory
 - Follow the instructions [here](https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-config-file/) to create the `secrets.yaml` file.
 - Set up env variables: MONGODB_URL, JWT_SECRET, OPENAI_API_KEY 
 3. Set up Ingres-nginx controller
@@ -90,7 +93,7 @@ Overview of the pipeline stages on Jenkinsfile:
 
 1. **Build**: Build Docker images using Docker Compose for testing.
 2. **Test**: Tests the Docker images using Docker Compose. 
-3. **Build production images**: Docker images for production are built using separate Docker Compose file for production.
+3. **Build production images**: Docker images for production are built using separate Docker Compose files for production.
 4. **Push images**: Docker images are pushed to DockerHub.
 5. **Deploy**: The application is deployed to a Kubernetes cluster using `kubectl`.
 
